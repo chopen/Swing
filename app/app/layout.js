@@ -16,6 +16,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata = {
   title: 'The Swing · Live P-B-P',
   description: 'NBA + NCAA live play-by-play momentum dashboard',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192.png',
+  },
 };
 
 export default function RootLayout({ children }) {

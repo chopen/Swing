@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import GameCard from './GameCard';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
@@ -99,7 +100,16 @@ export default function Dashboard() {
     >
       {/* Header */}
       <header className="bg-[#001c55] border-b-[3px] border-[#1493ff] sticky top-0 z-[200] flex justify-between items-center" style={{ padding: '14px 22px' }}>
-        <div>
+        <div className="flex items-center" style={{ gap: '16px' }}>
+          <Image
+            src="/swing-logo.jpg"
+            alt="The Swing logo"
+            width={48}
+            height={48}
+            className="rounded-full"
+            style={{ background: '#001c55' }}
+          />
+          <div>
           <div className="text-sm tracking-[.12em] text-[#1493ff] mb-1 font-medium">
             THE SWING &middot; LIVE PLAY-BY-PLAY MOMENTUM
           </div>
@@ -111,6 +121,7 @@ export default function Dashboard() {
               On this day: {otd}
             </div>
           )}
+          </div>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 justify-end mb-1">
