@@ -124,8 +124,9 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
               opacity="0.6"
             />
             <text
-              x={parseFloat(nowX) + 4}
-              y="8"
+              x={parseFloat(nowX) - 4}
+              y={H - 3}
+              textAnchor="end"
               fill="#8494a7"
               fontSize="6"
               fontFamily="'DM Sans', sans-serif"
