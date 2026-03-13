@@ -184,6 +184,38 @@ export default function Dashboard() {
                   {live.map((g) => (
                     <GameCard key={g.id} game={g} />
                   ))}
+                  {/* Legend card */}
+                  <div className="bg-white rounded-xl border border-[#dce6f0] flex flex-col justify-center" style={{ padding: '12px' }}>
+                    <div className="text-base font-bold text-[#1493ff]" style={{ marginBottom: '10px' }}>
+                      The Swing &middot; How to Read
+                    </div>
+                    <div className="flex flex-col" style={{ gap: '8px' }}>
+                      <div className="flex items-center" style={{ gap: '10px' }}>
+                        <span className="w-3 h-3 rounded-full bg-[#6b7c93] shrink-0" />
+                        <span className="text-sm text-[#001c55]">
+                          <strong>Momentum 0&ndash;100</strong> per team &mdash; process, not outcome
+                        </span>
+                      </div>
+                      <div className="flex items-center" style={{ gap: '10px' }}>
+                        <span className="w-3 h-3 rounded-full bg-[#C0392B] shrink-0" />
+                        <span className="text-sm text-[#001c55]">
+                          <strong>Bluffing</strong> &mdash; score &amp; momentum leaders disagree
+                        </span>
+                      </div>
+                      <div className="flex items-center" style={{ gap: '10px' }}>
+                        <span className="w-3 h-3 rounded-full bg-[#00C853] shrink-0" />
+                        <span className="text-sm text-[#001c55]">
+                          <strong>Comeback Watch</strong> &mdash; trailing team leads momentum
+                        </span>
+                      </div>
+                      <div className="flex items-center" style={{ gap: '10px' }}>
+                        <span className="w-3 h-3 rounded-full bg-[#FFD700] shrink-0" />
+                        <span className="text-sm text-[#001c55]">
+                          <strong>Swing Warning</strong> &mdash; close score, one-sided momentum
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -227,27 +259,6 @@ export default function Dashboard() {
           Last updated: <span className="font-mono">{lastUpdatedStr}</span> &middot; Tick #{tick}
         </div>
 
-        {/* Legend */}
-        <div className="mt-2 px-6 py-4 bg-[#e8eef6] border border-[#1493ff] rounded-xl flex gap-8 flex-wrap items-center">
-          <span className="text-sm font-bold text-[#1493ff]">
-            The Swing &middot; How to Read
-          </span>
-          <span className="text-sm text-[#001c55]">
-            Momentum 0&ndash;100 per team
-          </span>
-          <span className="text-sm text-[#001c55]">
-            Momentum &ne; Score &mdash; process, not outcome
-          </span>
-          <span className="text-sm text-[#C0392B] font-semibold">
-            &#x26A1; Bluffing = score &amp; momentum disagree
-          </span>
-          <span className="text-sm text-[#1493ff] font-semibold">
-            &#x1F440; Comeback = trailing team leads momentum
-          </span>
-          <span className="text-sm text-[#b8960c] font-semibold">
-            &#x26A0;&#xFE0F; Swing Warning = close score, one-sided momentum
-          </span>
-        </div>
       </main>
     </div>
   );

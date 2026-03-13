@@ -51,9 +51,9 @@ export default function GameCard({ game }) {
   if (g.bluffing) {
     borderClass += ' border-[#C0392B] shadow-[0_0_0_2px_#C0392B]';
   } else if (g.comeback) {
-    borderClass += ' border-[#1493ff] shadow-[0_0_0_2px_#1493ff]';
+    borderClass += ' border-[#00C853] shadow-[0_0_0_2px_#00C853]';
   } else if (g.swingWarning) {
-    borderClass += ' border-[#F1C40F] shadow-[0_0_0_2px_#F1C40F]';
+    borderClass += ' border-[#FFD700] shadow-[0_0_0_2px_#FFD700]';
   } else {
     borderClass += ' border-[#e0e0e0]';
   }
@@ -219,7 +219,7 @@ export default function GameCard({ game }) {
         </div>
       )}
       {g.comeback && (
-        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#1493ff] bg-blue-50/50 rounded-b-xl">
+        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#00C853] bg-green-50/50 rounded-b-xl">
           &#x1F440; Comeback Watch &mdash;{' '}
           {g.awayScore < g.homeScore ? g.awayAbbr : g.homeAbbr} trails score but leads momentum
           {g.status === 'STATUS_HALFTIME' && (
@@ -228,7 +228,7 @@ export default function GameCard({ game }) {
         </div>
       )}
       {g.swingWarning && (
-        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#b8960c] bg-yellow-50/50 rounded-b-xl">
+        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#FFD700] bg-yellow-50/50 rounded-b-xl">
           &#x26A0;&#xFE0F; Swing Warning &mdash; score is close but{' '}
           {g.mom.away > g.mom.home ? g.awayAbbr : g.homeAbbr} owns the momentum
           {g.status === 'STATUS_HALFTIME' && (
