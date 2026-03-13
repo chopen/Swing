@@ -210,6 +210,7 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             homeColor={g.homeColor}
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
+            isLive={isLive}
           />
 
           <PlayFeed

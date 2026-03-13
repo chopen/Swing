@@ -1,17 +1,67 @@
 'use client';
 
-export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr }) {
+export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr, isLive }) {
   if (!chartAway || !chartHome || chartAway.length < 2) return null;
 
   const W = 300;
   const H = 60;
   const n = Math.min(chartAway.length, chartHome.length);
 
+  // For live games, data occupies 75% of width; rest is forecast zone
+  const dataW = isLive ? W * 0.85 : W;
+  const forecastX = dataW; // "NOW" line position
+
   function toX(i) {
-    return (i / (n - 1)) * (W - 4) + 2;
+    return (i / (n - 1)) * (dataW - 4) + 2;
   }
   function toY(v) {
     return H - 4 - ((v - 5) / 90) * (H - 8);
+  }
+
+  // Get indices for last 10 minutes of data
+  function getLast10MinIndices(chart) {
+    if (!chart || chart.length < 2) return { startIdx: 0, endIdx: chart.length - 1 };
+    const lastTime = new Date(chart[chart.length - 1].t).getTime();
+    const cutoff = lastTime - 5 * 60 * 1000;
+    let startIdx = chart.length - 1;
+    for (let i = chart.length - 1; i >= 0; i--) {
+      if (new Date(chart[i].t).getTime() >= cutoff) {
+        startIdx = i;
+      } else {
+        break;
+      }
+    }
+    return { startIdx, endIdx: chart.length - 1 };
+  }
+
+  // Linear regression
+  function trendLine(chart, startIdx, endIdx) {
+    const points = [];
+    for (let i = startIdx; i <= endIdx; i++) {
+      points.push({ x: i, y: chart[i].v });
+    }
+    if (points.length < 2) return null;
+
+    const nPts = points.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    for (const p of points) {
+      sumX += p.x;
+      sumY += p.y;
+      sumXY += p.x * p.y;
+      sumXX += p.x * p.x;
+    }
+    const denom = nPts * sumXX - sumX * sumX;
+    if (denom === 0) return null;
+    const slope = (nPts * sumXY - sumX * sumY) / denom;
+    const intercept = (sumY - slope * sumX) / nPts;
+
+    return { startIdx, endIdx, slope, intercept };
+  }
+
+  function projectValue(trend, steps) {
+    if (!trend) return null;
+    const val = trend.slope * (trend.endIdx + steps) + trend.intercept;
+    return Math.max(5, Math.min(95, val));
   }
 
   const pathA = Array.from({ length: n }, (_, i) =>
@@ -23,7 +73,19 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
   ).join(' ');
 
   const midY = toY(50).toFixed(1);
-  const lastX = toX(n - 1).toFixed(1);
+  const nowX = toX(n - 1).toFixed(1);
+
+  // Compute trends
+  const awayRange = getLast10MinIndices(chartAway);
+  const homeRange = getLast10MinIndices(chartHome);
+  const awayTrend = trendLine(chartAway, awayRange.startIdx, awayRange.endIdx);
+  const homeTrend = trendLine(chartHome, homeRange.startIdx, homeRange.endIdx);
+
+  // Project to right edge of chart
+  const projSteps = Math.max(1, Math.round(n * 0.33));
+  const projEndX = W - 2;
+  const awayProjVal = projectValue(awayTrend, projSteps);
+  const homeProjVal = projectValue(homeTrend, projSteps);
 
   return (
     <div className="pb-3 pt-3 border-t border-[#f0f0f0]">
@@ -33,11 +95,114 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
         <span className="font-semibold" style={{ color: homeColor }}>{homeAbbr}</span>
       </div>
       <svg className="w-full h-[60px] block" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+        {/* Forecast zone background (live only) */}
+        {isLive && (
+          <rect
+            x={forecastX}
+            y="0"
+            width={W - forecastX}
+            height={H}
+            fill="#f0f4f9"
+            opacity="0.6"
+          />
+        )}
+
+        {/* Center line */}
         <line x1="0" y1={midY} x2={W} y2={midY} stroke="#e0e0e0" strokeWidth="1" strokeDasharray="3,3" />
+
+        {/* NOW vertical line (live only) */}
+        {isLive && (
+          <>
+            <line
+              x1={nowX}
+              y1="0"
+              x2={nowX}
+              y2={H}
+              stroke="#8494a7"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+              opacity="0.6"
+            />
+            <text
+              x={parseFloat(nowX) + 4}
+              y="8"
+              fill="#8494a7"
+              fontSize="6"
+              fontFamily="'DM Sans', sans-serif"
+              opacity="0.7"
+            >
+              NOW
+            </text>
+          </>
+        )}
+
+        {/* Projected trend lines (live only, in forecast zone) */}
+        {isLive && awayProjVal !== null && (
+          <line
+            x1={nowX}
+            y1={toY(chartAway[n - 1].v).toFixed(1)}
+            x2={projEndX.toFixed(1)}
+            y2={toY(awayProjVal).toFixed(1)}
+            stroke={awayColor}
+            strokeWidth="1.5"
+            strokeDasharray="4,3"
+            opacity="0.4"
+          />
+        )}
+        {isLive && homeProjVal !== null && (
+          <line
+            x1={nowX}
+            y1={toY(chartHome[n - 1].v).toFixed(1)}
+            x2={projEndX.toFixed(1)}
+            y2={toY(homeProjVal).toFixed(1)}
+            stroke={homeColor}
+            strokeWidth="1.5"
+            strokeDasharray="4,3"
+            opacity="0.4"
+          />
+        )}
+
+        {/* Historical trend lines (non-live only) */}
+        {!isLive && awayTrend && (
+          <line
+            x1={toX(awayTrend.startIdx).toFixed(1)}
+            y1={toY(awayTrend.slope * awayTrend.startIdx + awayTrend.intercept).toFixed(1)}
+            x2={toX(awayTrend.endIdx).toFixed(1)}
+            y2={toY(awayTrend.slope * awayTrend.endIdx + awayTrend.intercept).toFixed(1)}
+            stroke={awayColor}
+            strokeWidth="1.5"
+            strokeDasharray="4,3"
+            opacity="0.35"
+          />
+        )}
+        {!isLive && homeTrend && (
+          <line
+            x1={toX(homeTrend.startIdx).toFixed(1)}
+            y1={toY(homeTrend.slope * homeTrend.startIdx + homeTrend.intercept).toFixed(1)}
+            x2={toX(homeTrend.endIdx).toFixed(1)}
+            y2={toY(homeTrend.slope * homeTrend.endIdx + homeTrend.intercept).toFixed(1)}
+            stroke={homeColor}
+            strokeWidth="1.5"
+            strokeDasharray="4,3"
+            opacity="0.35"
+          />
+        )}
+
+        {/* Main momentum lines */}
         <path d={pathA} fill="none" stroke={awayColor} strokeWidth="2" opacity="0.85" />
         <path d={pathH} fill="none" stroke={homeColor} strokeWidth="2" opacity="0.85" />
-        <circle cx={lastX} cy={toY(chartAway[n - 1].v).toFixed(1)} r="3.5" fill={awayColor} />
-        <circle cx={lastX} cy={toY(chartHome[n - 1].v).toFixed(1)} r="3.5" fill={homeColor} />
+
+        {/* Current position dots */}
+        <circle cx={nowX} cy={toY(chartAway[n - 1].v).toFixed(1)} r="3.5" fill={awayColor} />
+        <circle cx={nowX} cy={toY(chartHome[n - 1].v).toFixed(1)} r="3.5" fill={homeColor} />
+
+        {/* Projected end dots (live only, smaller and lighter) */}
+        {isLive && awayProjVal !== null && (
+          <circle cx={projEndX.toFixed(1)} cy={toY(awayProjVal).toFixed(1)} r="2.5" fill={awayColor} opacity="0.4" />
+        )}
+        {isLive && homeProjVal !== null && (
+          <circle cx={projEndX.toFixed(1)} cy={toY(homeProjVal).toFixed(1)} r="2.5" fill={homeColor} opacity="0.4" />
+        )}
       </svg>
     </div>
   );
