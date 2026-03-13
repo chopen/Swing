@@ -1,19 +1,39 @@
 # The Swing — Architecture
 
-The Swing is a **single-page, zero-build, self-contained web app** — everything lives in one HTML file with no framework, no bundler, and no backend.
+The Swing is a **full-stack Next.js application** that computes real-time basketball momentum from ESPN play-by-play data, persists results in SQLite, and serves them via API routes. Deployed on Vercel.
 
 ## Structure
 
 ```
-index.html (34KB)
-├── CSS (inline <style>)          — all styling, responsive grid, animations
-├── HTML (static shell)           — header, filter bar, empty <main> container
-└── JS  (inline <script>)        — entire app logic
-    ├── Momentum Engine           — core algorithm
-    ├── Data Layer                — ESPN API fetching
-    ├── Alert Detection           — three-tier bluff/comeback/warning system
-    ├── Renderer                  — DOM construction (string-based, no virtual DOM)
-    └── Boot / Refresh Loop       — 20-second polling cycle
+app/                              Next.js application (App Router)
+├── app/
+│   ├── page.js                   Dashboard UI (React + Tailwind CSS)
+│   ├── layout.js                 Root layout
+│   ├── globals.css               Tailwind imports
+│   └── api/                      Server-side API routes
+│       ├── games/route.js        GET /api/games — list with filters
+│       ├── games/[gameId]/
+│       │   ├── route.js          GET /api/games/:id — detail
+│       │   ├── momentum/route.js GET — full momentum timeline
+│       │   ├── plays/route.js    GET — play-by-play with scores
+│       │   └── alerts/route.js   GET — alerts for this game
+│       ├── live/route.js         GET /api/live — live games with momentum
+│       ├── alerts/route.js       GET /api/alerts — recent alerts
+│       └── stats/alerts/route.js GET /api/stats/alerts — backfill accuracy
+├── lib/                          Shared backend logic (Node.js)
+│   ├── config.js                 Constants, weights, thresholds, ESPN URLs
+│   ├── momentum.js               Momentum engine (sliding window algorithm)
+│   ├── alerts.js                 Three-tier alert detection
+│   ├── espn.js                   ESPN API client (fetch + parse)
+│   └── db.js                     SQLite schema, connection, helpers
+├── scripts/                      CLI tools
+│   ├── backfill.js               Historical game backfill from ESPN
+│   └── analysis.js               Post-backfill accuracy reporting
+├── vercel.json                   Deployment config
+└── package.json                  Dependencies and npm scripts
+
+index.html                        Original standalone prototype (archived reference)
+archive/python-backend/            Archived Python implementation (reference only)
 ```
 
 ## Data Flow
@@ -25,23 +45,25 @@ ESPN Public API (no auth)
     └── /summary?event={id}      → play-by-play arrays for live/final games
          │
          ▼
-    parseScoreboard()            → normalize into game objects (teams, scores, colors, IDs)
-         │
+    espn.js                      → fetch + parse scoreboard events
+         │                         normalize into game objects (teams, scores, colors, IDs)
+         │                         resolve team identity (ID for NCAA, abbreviation for NBA)
          ▼
-    computeMomentumFromPlays()   → sliding window of 12 events, weighted scoring
+    momentum.js                  → sliding window of 12 events, weighted scoring
          │                         maps raw [-15, +15] → [0, 100] per team
-         │                         produces: momentum values, sparkline chart data, recent plays
+         │                         produces: momentum values, chart data, recent plays
          ▼
-    detectAlerts()               → compares score leader vs momentum leader
+    alerts.js                    → compares score leader vs momentum leader
          │                         three tiers: BLUFFING > COMEBACK > SWING WARNING
          │                         halftime-aware thresholds (tighter with full half of data)
          ▼
-    render()                     → builds HTML string, sets innerHTML on <main>
-         │                         sections: LIVE → UPCOMING → FINAL
-         │                         each game card: score, momentum bars, sparkline, alerts, play feed
+    db.js (SQLite)               → persists games, plays, momentum snapshots, alerts
+         │                         WAL mode for concurrent read/write
          ▼
-    wireFeedToggles()            → attaches click handlers for collapsible play feeds
-                                   preserves open/closed state across re-renders via openFeeds Set
+    Next.js API routes           → serve data as JSON to frontend
+         │
+         ▼
+    React components             → render dashboard with Tailwind CSS
 ```
 
 ## Momentum Engine
@@ -86,13 +108,13 @@ At halftime, detection thresholds tighten because a full half of data provides a
 
 ## Key Design Decisions
 
-- **No backend** — pulls directly from ESPN's public, unauthenticated API endpoints from the browser
+- **Server-side computation** — momentum and alerts are computed in Node.js API routes, not in the browser; ESPN data is fetched server-side
+- **SQLite persistence** — games, plays, momentum snapshots, and alerts are stored in a local SQLite database (better-sqlite3 with WAL mode)
 - **Independent momentum** — each team's score is computed from its own plays, not relative to the opponent
 - **Halftime freeze** — reuses cached momentum during halftime instead of re-fetching (no new plays = no recompute)
 - **Chart history preservation** — if a refresh returns fewer data points, the previous chart data is kept
 - **Team ID resolution** — NBA uses abbreviations, NCAA uses numeric IDs; `resolveTeam()` handles both
-- **String-based rendering** — no virtual DOM; `render()` builds an HTML string and sets `innerHTML` on each 20-second tick
-- **State preservation across re-renders** — `openFeeds` Set tracks which play feed panels are expanded so they survive DOM rebuilds
+- **Vercel deployment** — Next.js App Router with serverless API routes; auto-deploys from GitHub
 
 ## Data Sources
 
@@ -104,19 +126,21 @@ All data is pulled from ESPN's public (unauthenticated) API endpoints:
 | `site.api.espn.com/.../mens-college-basketball/scoreboard` | NCAA game list, scores, status |
 | `site.api.espn.com/.../summary?event={id}` | Play-by-play data for a specific game |
 
-No API key required. Data refreshes every 20 seconds automatically. Cache-busting is handled via a `_t` timestamp query parameter.
+No API key required. Cache-busting is handled via a `_t` timestamp query parameter.
 
-## Supporting Files
+## Database Schema
 
-| File | Purpose |
-|------|---------|
-| `serve.py` | Python HTTP server with CORS headers (ESPN API needs HTTP, not `file://`) |
-| `docs/the_swing_overview.js` | Node.js script using `docx` library to generate a branded Word document with product overview, algorithm explanation, and findings |
+| Table | Purpose |
+|-------|---------|
+| `games` | Game metadata: teams, scores, status, venue, broadcast |
+| `plays` | Full play-by-play with possession scores per play |
+| `momentum_snapshots` | Chart data: momentum values sampled every 5 plays |
+| `game_momentum` | Final momentum values per game |
+| `alerts` | Every alert detected with game state at time of detection |
+| `backfill_log` | Per-game backfill summary with alert accuracy |
 
 ## Limitations
 
 - **Basketball only** — the algorithm is validated on NBA and NCAA D1 men's basketball; event weights would need re-validation for other sports
 - **ESPN dependency** — relies entirely on ESPN's public API; no fallback data source
-- **No persistence** — momentum history resets on page refresh; no database or local storage
-- **No authentication** — no user accounts, saved preferences, or personalization
-- **Client-side only** — all API calls happen from the browser, which limits scalability and exposes API usage patterns
+- **Serverless constraints** — Vercel serverless functions have execution time limits; long-running polling requires the backfill CLI script run locally

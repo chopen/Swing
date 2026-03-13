@@ -6,8 +6,9 @@ Real-time NBA + NCAA basketball momentum tracker. Computes possession-level mome
 
 ## What It Does
 
-- Pulls live scores + play-by-play from ESPN's public API every 20 seconds
+- Pulls live scores + play-by-play from ESPN's public API
 - Computes a 0–100 momentum score per team from a sliding window of the last 12 possession events
+- Persists games, plays, momentum snapshots, and alerts in SQLite
 - Shows sparkline momentum charts, live play feeds, and three alert tiers:
   - ⚡ **SCORE IS BLUFFING** — score and momentum leaders disagree
   - 👀 **COMEBACK WATCH** — trailing team dominates momentum
@@ -15,57 +16,105 @@ Real-time NBA + NCAA basketball momentum tracker. Computes possession-level mome
 
 ---
 
+## Tech Stack
+
+- **Next.js** (App Router) with plain JavaScript and JSX
+- **Tailwind CSS** for styling
+- **better-sqlite3** for persistence
+- **Vercel** for deployment
+- **ESPN Public API** for live data (no key required)
+
+---
+
 ## Running Locally
 
-> **Important:** The ESPN API requires the page to be served over HTTP, not opened as a `file://` URL. Opening `index.html` directly will result in CORS errors and no data loading.
-
-### Option 1 — Python (easiest, no install required)
-
 ```bash
-python3 serve.py
+cd app
+npm install
+npm run dev
 ```
 
-Or manually:
+Then open: [http://localhost:3000](http://localhost:3000)
 
-```bash
-python3 -m http.server 8000
-```
-
-Then open: [http://localhost:8000](http://localhost:8000)
-
-### Option 2 — Node.js
-
-```bash
-npx serve .
-```
-
-Then open the URL it gives you (usually `http://localhost:3000`).
-
-### Option 3 — VS Code Live Server
-
-Install the [Live Server extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer), right-click `index.html` → **Open with Live Server**.
+Hot reload is enabled — changes to components and API routes reflect immediately.
 
 ---
 
-## Running on GitHub Pages
+## Deployment
 
-1. Push this folder to a GitHub repo
-2. Go to **Settings → Pages**
-3. Set source to `main` branch, `/ (root)` folder
-4. GitHub will give you a URL like `https://yourusername.github.io/Swing/`
+The project is configured for **Vercel** with auto-deploy from GitHub.
 
-The dashboard will work live at that URL with no server needed — GitHub Pages serves over HTTPS which satisfies the CORS requirement.
+- **Root directory:** `app/`
+- **Live URL:** https://the-swing.vercel.app
+
+To deploy manually:
+
+```bash
+vercel deploy --prod
+```
 
 ---
 
-## Files
+## Backfill & Analysis
 
-| File | Description |
-|------|-------------|
-| `index.html` | The full dashboard — all HTML, CSS, and JS in one self-contained file |
-| `serve.py` | Convenience script to launch a local server |
-| `docs/the_swing_overview.js` | Product overview document generator (Node.js + docx) |
-| `README.md` | This file |
+Historical game data can be backfilled from ESPN and analyzed for algorithm accuracy:
+
+```bash
+cd app
+
+# Backfill NBA games for a date range
+npm run backfill -- --league NBA --start 2025-10-22 --end 2026-03-13
+
+# Backfill NCAA games
+npm run backfill -- --league CBB --start 2025-11-03 --end 2026-03-13
+
+# Run analysis on backfill results
+npm run analysis -- --league NBA
+```
+
+---
+
+## Project Structure
+
+```
+app/                          Next.js application
+├── app/                      App Router pages and API routes
+│   ├── page.js               Dashboard (React)
+│   └── api/                  REST API endpoints
+│       ├── games/            Game list, detail, momentum, plays, alerts
+│       ├── live/             Currently live games with momentum
+│       ├── alerts/           Recent alerts across all games
+│       └── stats/alerts/     Aggregate alert accuracy
+├── lib/                      Shared backend logic
+│   ├── config.js             Constants, weights, thresholds
+│   ├── momentum.js           Momentum engine (sliding window algorithm)
+│   ├── alerts.js             Three-tier alert detection
+│   ├── espn.js               ESPN API client
+│   └── db.js                 SQLite schema and helpers
+├── scripts/                  CLI tools
+│   ├── backfill.js           Historical game backfill
+│   └── analysis.js           Post-backfill reporting
+└── vercel.json               Vercel deployment config
+
+index.html                    Original standalone dashboard prototype
+docs/                         Product overview document generator
+archive/python-backend/       Archived Python implementation (reference only)
+```
+
+---
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/games?date=&league=&status=` | List games with optional filters |
+| `GET /api/games/:id` | Single game with momentum and recent plays |
+| `GET /api/games/:id/momentum` | Full momentum timeline (chart data) |
+| `GET /api/games/:id/plays` | Full play-by-play with possession scores |
+| `GET /api/games/:id/alerts` | All alerts for a game |
+| `GET /api/live` | All live games with momentum, charts, and alerts |
+| `GET /api/alerts?type=&date=` | Recent alerts across all games |
+| `GET /api/stats/alerts` | Aggregate alert accuracy from backfill |
 
 ---
 
@@ -113,7 +162,7 @@ All data is pulled from ESPN's public (unauthenticated) API endpoints:
 - `site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard`
 - `site.api.espn.com/apis/site/v2/sports/basketball/{league}/summary?event={id}`
 
-No API key required. Data refreshes every 20 seconds automatically.
+No API key required. Cache-busting is handled via a `_t` timestamp query parameter.
 
 ---
 
@@ -121,4 +170,3 @@ No API key required. Data refreshes every 20 seconds automatically.
 
 - **Basketball only.** The algorithm is validated on NBA and NCAA D1 men's basketball. Do not apply to other sports without re-validating signal weights.
 - **CBB play attribution:** NCAA play-by-play data uses numeric team IDs rather than abbreviations. The algorithm resolves team identity via ID lookup from the scoreboard.
-- **Best viewed at full browser width** — cards are designed for a 3-column grid layout.

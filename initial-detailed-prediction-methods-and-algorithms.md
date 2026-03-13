@@ -16,7 +16,7 @@ The fundamental insight: when the score and momentum diverge, the score is "bluf
 
 ### 2.1 Source
 
-All data comes from ESPN's public (unauthenticated) API. Two types of requests are made:
+All data comes from ESPN's public (unauthenticated) API, fetched **server-side** via Node.js (`app/lib/espn.js`). Two types of requests are made:
 
 1. **Scoreboard requests** — retrieve the full slate of games for today
    - NBA: `site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard`
@@ -25,12 +25,15 @@ All data comes from ESPN's public (unauthenticated) API. Two types of requests a
 2. **Summary/detail requests** — retrieve play-by-play data for a specific game
    - `site.api.espn.com/apis/site/v2/sports/basketball/{league}/summary?event={gameId}`
 
-### 2.2 Polling Cycle
+### 2.2 Data Pipeline
 
-- Every **20 seconds**, the system fetches fresh scoreboard data for both NBA and NCAA
+- ESPN data is fetched server-side in Node.js (not from the browser)
 - For each game that is **in progress**, at **halftime**, or **final** (with at least 2 periods played), a detail request fetches the play-by-play array
 - Cache-busting is applied via a `_t={timestamp}` query parameter to prevent stale responses
 - At halftime, the detail fetch is **skipped entirely** — the last computed momentum snapshot is reused (see Section 6)
+- All results are persisted in SQLite (games, plays, momentum snapshots, alerts) for historical analysis
+- The frontend reads from Next.js API routes (`/api/games`, `/api/live`, etc.), not ESPN directly
+- Historical backfill is handled by a CLI script (`app/scripts/backfill.js`) that processes completed games from any date range
 
 ### 2.3 Play Object Structure
 

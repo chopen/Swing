@@ -24,8 +24,11 @@
                        │
                        ▼
           ┌────────────────────────┐
-          │   loadScoreboards()    │
+          │   espn.js              │
+          │   (server-side)        │
           │                        │
+          │  fetchNbaScoreboard()  │
+          │  fetchCbbScoreboard()  │
           │  Merges NBA + NCAA     │
           │  Tags each event with  │
           │  league: 'NBA'|'CBB'   │
@@ -33,7 +36,7 @@
                        │
                        ▼
           ┌────────────────────────┐
-          │  parseScoreboard()     │
+          │  parseScoreboardEvent()│
           │  (per event)           │
           │                        │
           │  Extracts:             │
@@ -52,7 +55,7 @@
           │  Is game STATUS_HALFTIME with existing momentum?   │
           │  ┌─── YES ──────────────────────────────────────┐  │
           │  │  HALFTIME FREEZE                             │  │
-          │  │  Reuse previous momentum snapshot            │  │
+          │  │  Reuse previous momentum from SQLite         │  │
           │  │  Skip detail fetch entirely                  │  │
           │  │  Jump directly to Alert Detection ─────────────────┐
           │  └──────────────────────────────────────────────┘  │  │
@@ -71,7 +74,7 @@
                                         │                         │
                                         ▼                         │
                        ┌────────────────────────────┐             │
-                       │   loadGameDetail()          │             │
+                       │   fetchGameSummary()        │             │
                        │   /summary?event={id}       │             │
                        │                             │             │
                        │   Returns:                  │             │
@@ -200,6 +203,7 @@
                             ▼                                     │
               ┌──────────────────────────────────┐                │
               │       detectAlerts()              │◄───────────────┘
+              │       (alerts.js)                 │
               │                                   │
               │  Inputs:                          │
               │  • awayMomentum, homeMomentum     │
@@ -246,69 +250,51 @@
                              │
                              ▼
               ┌──────────────────────────────────┐
-              │         render()                  │
+              │       db.js (SQLite)              │
               │                                   │
-              │  Sections (in order):             │
+              │  Persists:                        │
               │  ┌─────────────────────────────┐  │
-              │  │ 🔴 IN PROGRESS               │  │
-              │  │ (includes HALFTIME)          │  │
-              │  ├─────────────────────────────┤  │
-              │  │ UPCOMING TONIGHT             │  │
-              │  ├─────────────────────────────┤  │
-              │  │ FINAL                        │  │
+              │  │ games                       │  │
+              │  │ plays (with possession      │  │
+              │  │   scores per play)          │  │
+              │  │ momentum_snapshots (chart)  │  │
+              │  │ game_momentum (final vals)  │  │
+              │  │ alerts (with game state)    │  │
+              │  │ backfill_log (accuracy)     │  │
               │  └─────────────────────────────┘  │
               │                                   │
-              │  Per game card:                   │
-              │  ┌─────────────────────────────┐  │
-              │  │ League · Matchup   Status   │  │
-              │  │                              │  │
-              │  │ AWAY  Score  HOME            │  │
-              │  │                              │  │
-              │  │ ████░░░  SWING  ░░░████     │  │
-              │  │ 72              38           │  │
-              │  │                              │  │
-              │  │ ~~~~ Sparkline Chart ~~~~    │  │
-              │  │                              │  │
-              │  │ ⚡ SCORE IS BLUFFING          │  │
-              │  │                              │  │
-              │  │ ▸ PLAY FEED (collapsible)    │  │
-              │  │                              │  │
-              │  │ Venue, City                  │  │
-              │  └─────────────────────────────┘  │
+              │  WAL mode for concurrent access   │
               └──────────────┬────────────────────┘
                              │
                              ▼
               ┌──────────────────────────────────┐
-              │    wireFeedToggles()              │
+              │   Next.js API Routes              │
               │                                   │
-              │  Attaches click handlers to       │
-              │  ▸ PLAY FEED toggles              │
-              │                                   │
-              │  openFeeds: Set()                 │
-              │  Tracks which feeds are expanded  │
-              │  Preserves state across           │
-              │  20-second re-renders             │
-              └──────────────────────────────────┘
-                             │
-                             │
-                    ─ ─ ─ ─ ─│─ ─ ─ ─ ─
+              │  GET /api/games        List games  │
+              │  GET /api/games/:id    Detail      │
+              │  GET /api/games/:id/   Momentum,   │
+              │      momentum,plays,   Plays,      │
+              │      alerts            Alerts      │
+              │  GET /api/live         Live games   │
+              │  GET /api/alerts       All alerts   │
+              │  GET /api/stats/alerts Accuracy     │
+              └──────────────┬────────────────────┘
                              │
                              ▼
               ┌──────────────────────────────────┐
-              │        REFRESH LOOP               │
+              │   React + Tailwind CSS            │
               │                                   │
-              │  setInterval(loadAll, 20000)      │
-              │                                   │
-              │  Every 20 seconds:                │
-              │  1. Fetch scoreboards             │
-              │  2. Fetch details for live games  │
-              │  3. Compute momentum              │
-              │  4. Detect alerts                 │
-              │  5. Re-render DOM                 │
-              │  6. Restore feed toggle states    │
-              │                                   │
-              │  Manual refresh also available    │
-              │  via ↻ REFRESH button             │
+              │  Dashboard renders game cards:    │
+              │  ┌─────────────────────────────┐  │
+              │  │ League · Matchup   Status   │  │
+              │  │ AWAY  Score  HOME            │  │
+              │  │ ████░░░  SWING  ░░░████     │  │
+              │  │ 72              38           │  │
+              │  │ ~~~~ Sparkline Chart ~~~~    │  │
+              │  │ ⚡ SCORE IS BLUFFING          │  │
+              │  │ ▸ PLAY FEED (collapsible)    │  │
+              │  │ Venue, City                  │  │
+              │  └─────────────────────────────┘  │
               └──────────────────────────────────┘
 ```
 
@@ -317,12 +303,12 @@
 ## Simplified Linear Flow
 
 ```
-ESPN API
+ESPN API (server-side fetch)
    │
    ├──► Scoreboard (NBA + NCAA)
    │         │
    │         ▼
-   │    parseScoreboard() ──► game objects (scores, teams, status)
+   │    parseScoreboardEvent() ──► game objects (scores, teams, status)
    │
    ├──► Play-by-Play (per live game)
    │         │
@@ -340,10 +326,9 @@ ESPN API
    │         │
    │         ▼
    │    detectAlerts() ──► BLUFFING / COMEBACK / SWING WARNING
+   │         │
+   │         ▼
+   │    SQLite ──► persist games, plays, snapshots, alerts
    │
-   └──► render() ──► DOM update ──► user sees dashboard
-                                         │
-                                    wait 20 seconds
-                                         │
-                                    loop back to top
+   └──► Next.js API routes ──► React dashboard ──► user sees results
 ```
