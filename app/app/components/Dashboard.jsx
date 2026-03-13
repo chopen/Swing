@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import GameCard from './GameCard';
+import AuthModal from './AuthModal';
+import Footer from './Footer';
+import SportsNav from './SportsNav';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
 const REFRESH_MS = 20000;
@@ -17,6 +20,9 @@ export default function Dashboard() {
   const [tick, setTick] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [otd, setOtd] = useState(null);
+  const [user, setUser] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState('signin');
   const timerRef = useRef(null);
   const clockRef = useRef(null);
   const finalTimestamps = useRef({});
@@ -45,11 +51,29 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((d) => d.event && setOtd(d.event))
       .catch(() => {});
+    fetch('/api/auth/me')
+      .then((r) => r.json())
+      .then((d) => d.user && setUser(d.user))
+      .catch(() => {});
     return () => {
       clearInterval(timerRef.current);
       clearInterval(clockRef.current);
     };
   }, [fetchData]);
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/signout', { method: 'POST' });
+      setUser(null);
+    } catch (err) {
+      console.error('Sign out failed:', err);
+    }
+  };
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setShowAuth(true);
+  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -139,7 +163,7 @@ export default function Dashboard() {
             LIVE PLAY-BY-PLAY MOMENTUM FORECASTER
           </div>
           <div className="header-title font-extrabold text-white tracking-tight">
-            THE SWING &middot; NBA + NCAA
+            THE SWING
           </div>
           {otd && (
             <div className="text-xs text-[#8494a7] mt-1 italic">
@@ -158,8 +182,76 @@ export default function Dashboard() {
           <div className="text-sm text-[#6b7c93]">
             <span className="font-mono">{timeStr}</span> &middot; {dateStr}
           </div>
+          <div className="flex items-center justify-end" style={{ gap: '10px', marginTop: '8px' }}>
+            {user ? (
+              <>
+                <span className="header-auth-greeting text-sm font-semibold text-white">
+                  Hi, {user.firstName}
+                </span>
+                <span className="header-auth-greeting" style={{ fontSize: '18px', cursor: 'pointer', color: '#FFD700' }} title="Alerts">
+                  &#x1F514;
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="header-auth-signout"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#8494a7',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                    textDecoration: 'underline',
+                    padding: '0',
+                  }}
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => openAuth('signin')}
+                  className="header-auth-signin"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#8494a7',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                    textDecoration: 'underline',
+                    padding: '0',
+                  }}
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => openAuth('register-phone')}
+                  className="header-auth-alerts"
+                  style={{
+                    background: '#1493ff',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '20px',
+                    padding: '6px 16px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  <span className="header-auth-alerts-icon" style={{ display: 'none' }}>&#x1F514;</span>
+                  <span className="header-auth-alerts-text">Get Alerts</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </header>
+
+      {/* Sports nav */}
+      <SportsNav />
 
       {/* Filter tabs */}
       <div className="filter-bar bg-white border-b border-[#dce6f0]">
@@ -298,6 +390,16 @@ export default function Dashboard() {
 
 
       </main>
+
+      <Footer />
+
+      {showAuth && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setShowAuth(false)}
+          onAuth={(u) => setUser(u)}
+        />
+      )}
     </div>
   );
 }

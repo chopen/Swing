@@ -123,6 +123,11 @@ body {
   overflow: visible;
 }
 
+/* --- Sports nav --- */
+.sports-nav::-webkit-scrollbar {
+  display: none;
+}
+
 /* --- Main content --- */
 .main-content {
   max-width: 1400px;
@@ -161,6 +166,36 @@ body {
 
   .header-live-section > div:first-child {
     margin-bottom: 0;
+  }
+
+  /* Auth: mobile compact mode */
+  .header-auth-greeting {
+    font-size: 12px !important;
+  }
+  .header-auth-signout {
+    font-size: 11px !important;
+  }
+  .header-auth-signin {
+    font-size: 11px !important;
+  }
+  .header-auth-alerts {
+    padding: 4px 10px !important;
+    font-size: 0 !important;
+  }
+  .header-auth-alerts-icon {
+    display: inline !important;
+    font-size: 16px !important;
+  }
+  .header-auth-alerts-text {
+    display: none !important;
+  }
+
+  .sports-nav {
+    padding: 0 10px !important;
+  }
+  .sports-nav button {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
   }
 
   .filter-bar {
