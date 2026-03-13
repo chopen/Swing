@@ -40,3 +40,8 @@ swing-original-conversations.json
 swing.db
 swing.db-wal
 swing.db-shm
+
+# Next.js
+app/.next/
+app/out/
+.vercel
