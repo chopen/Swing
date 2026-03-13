@@ -36,3 +36,218 @@ body {
   background: #ddd;
   border-radius: 3px;
 }
+
+/* ===== Responsive Breakpoints ===== */
+
+/* --- Header --- */
+.header-main {
+  padding: 14px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+}
+
+.header-subtitle {
+  font-size: 0.875rem;
+}
+
+.header-title {
+  font-size: 1.875rem;
+}
+
+.header-live-section {
+  display: block;
+}
+
+/* --- Filter bar --- */
+.filter-bar {
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow-x: visible;
+}
+
+.filter-refresh {
+  margin-left: 48px;
+}
+
+.refresh-label {
+  display: inline;
+}
+
+/* --- Game card grid --- */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 0.875rem;
+}
+
+/* --- Game card --- */
+.game-card-pad {
+  padding: 12px;
+}
+
+.score-num {
+  font-size: 3rem;
+}
+
+.score-dash {
+  font-size: 1.875rem;
+}
+
+/* --- Alert strip fix for mobile --- */
+.alert-strip {
+  margin-left: -12px;
+  margin-right: -12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* --- Section padding (live games container) --- */
+.section-pad {
+  padding: 20px;
+}
+
+/* --- Main content --- */
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1% 2% 2% 2%;
+}
+
+/* ===== Mobile: < 640px ===== */
+@media (max-width: 639px) {
+  .header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .header-title {
+    font-size: 1.15rem;
+  }
+
+  .header-live-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .header-live-section > div:first-child {
+    margin-bottom: 0;
+  }
+
+  .filter-bar {
+    padding: 12px 14px;
+    gap: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-bar button {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .filter-refresh {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .refresh-label {
+    display: none;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-card-pad {
+    padding: 10px;
+  }
+
+  .score-num {
+    font-size: 2rem;
+  }
+
+  .score-dash {
+    font-size: 1.25rem;
+  }
+
+  .main-content {
+    padding: 8px 10px 16px 10px;
+  }
+
+  .section-pad {
+    padding: 14px;
+  }
+
+  .alert-strip {
+    margin-left: -10px;
+    margin-right: -10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ===== Tablet: 640px - 1024px ===== */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .header-main {
+    padding: 12px 18px;
+  }
+
+  .header-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-title {
+    font-size: 1.45rem;
+  }
+
+  .filter-bar {
+    padding: 16px 20px;
+  }
+
+  .filter-refresh {
+    margin-left: 24px;
+  }
+
+  .game-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .main-content {
+    padding: 1% 1.5% 2% 1.5%;
+  }
+
+  .section-pad {
+    padding: 16px;
+  }
+}

@@ -6,6 +6,7 @@ import GameCard from './GameCard';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
 const REFRESH_MS = 20000;
+const FINAL_LINGER_MS = 5 * 60 * 1000; // 5 minutes
 
 export default function Dashboard() {
   const [games, setGames] = useState([]);
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [otd, setOtd] = useState(null);
   const timerRef = useRef(null);
   const clockRef = useRef(null);
+  const finalTimestamps = useRef({});
 
   const fetchData = useCallback(async () => {
     try {
@@ -55,18 +57,39 @@ export default function Dashboard() {
   };
 
   const allGames = games;
-  const liveCount = allGames.filter((g) => LIVE_STATUSES.has(g.status)).length;
+  const now = Date.now();
+
+  // Track when games first go final
+  allGames.forEach((g) => {
+    if (g.status === 'STATUS_FINAL' && !finalTimestamps.current[g.id]) {
+      finalTimestamps.current[g.id] = now;
+    }
+    if (LIVE_STATUSES.has(g.status)) {
+      delete finalTimestamps.current[g.id];
+    }
+  });
+
+  // A game is "recently final" if it went final less than 5 minutes ago
+  const isRecentlyFinal = (g) =>
+    g.status === 'STATUS_FINAL' &&
+    finalTimestamps.current[g.id] &&
+    now - finalTimestamps.current[g.id] < FINAL_LINGER_MS;
+
+  const isLiveOrLingering = (g) => LIVE_STATUSES.has(g.status) || isRecentlyFinal(g);
+  const isTrulyFinal = (g) => g.status === 'STATUS_FINAL' && !isRecentlyFinal(g);
+
+  const liveCount = allGames.filter(isLiveOrLingering).length;
   const preCount = allGames.filter((g) => g.status === 'STATUS_SCHEDULED').length;
-  const finalCount = allGames.filter((g) => g.status === 'STATUS_FINAL').length;
+  const finalCount = allGames.filter(isTrulyFinal).length;
 
   let filtered = allGames;
-  if (filter === 'LIVE') filtered = allGames.filter((g) => LIVE_STATUSES.has(g.status));
+  if (filter === 'LIVE') filtered = allGames.filter(isLiveOrLingering);
   else if (filter === 'PRE') filtered = allGames.filter((g) => g.status === 'STATUS_SCHEDULED');
-  else if (filter === 'FINAL') filtered = allGames.filter((g) => g.status === 'STATUS_FINAL');
+  else if (filter === 'FINAL') filtered = allGames.filter(isTrulyFinal);
 
-  const live = filtered.filter((g) => LIVE_STATUSES.has(g.status));
+  const live = filtered.filter(isLiveOrLingering);
   const pre = filtered.filter((g) => g.status === 'STATUS_SCHEDULED');
-  const final_ = filtered.filter((g) => g.status === 'STATUS_FINAL');
+  const final_ = filtered.filter(isTrulyFinal);
 
   const timeStr = currentTime.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -99,22 +122,22 @@ export default function Dashboard() {
       style={{ fontFamily: "'DM Sans', sans-serif", color: '#222' }}
     >
       {/* Header */}
-      <header className="bg-[#001c55] border-b-[3px] border-[#1493ff] sticky top-0 z-[200] flex justify-between items-center" style={{ padding: '14px 22px' }}>
+      <header className="header-main bg-[#001c55] border-b-[3px] border-[#1493ff] sticky top-0 z-[200]">
         <div className="flex items-center" style={{ gap: '16px' }}>
           <Image
             src="/swing-logo.jpg"
             alt="The Swing logo"
             width={48}
             height={48}
-            className="rounded-full"
+            className="rounded-full header-logo"
             style={{ background: '#001c55' }}
           />
           <div>
-          <div className="text-sm tracking-[.12em] text-[#1493ff] mb-1 font-medium">
-            THE SWING &middot; LIVE PLAY-BY-PLAY MOMENTUM
+          <div className="header-subtitle tracking-[.12em] text-[#1493ff] mb-1 font-medium">
+            LIVE PLAY-BY-PLAY MOMENTUM FORECASTER
           </div>
-          <div className="text-3xl font-extrabold text-white tracking-tight">
-            NBA + NCAA &middot; {dateStr} {timeStr}
+          <div className="header-title font-extrabold text-white tracking-tight">
+            THE SWING &middot; NBA + NCAA
           </div>
           {otd && (
             <div className="text-xs text-[#8494a7] mt-1 italic">
@@ -123,7 +146,7 @@ export default function Dashboard() {
           )}
           </div>
         </div>
-        <div className="text-right">
+        <div className="header-live-section text-right">
           <div className="flex items-center gap-2 justify-end mb-1">
             <span className="w-2 h-2 rounded-full bg-[#C0392B] animate-pulse" />
             <span className="text-base font-bold text-[#C0392B]">
@@ -137,23 +160,23 @@ export default function Dashboard() {
       </header>
 
       {/* Filter tabs */}
-      <div className="bg-white border-b border-[#dce6f0] flex items-center gap-4" style={{ padding: '20px 32px' }}>
+      <div className="filter-bar bg-white border-b border-[#dce6f0]">
         {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            style={{ padding: '6px 12px' }}
             className={`border-none rounded-lg text-base font-bold cursor-pointer transition-all duration-150 ${
               filter === f.key
                 ? 'bg-[#001c55] text-white'
                 : 'bg-transparent text-[#001c55] hover:bg-[#dce6f0]'
             }`}
+            style={{ padding: '6px 12px' }}
           >
             {f.dot && filter !== f.key ? '\u{1F534} ' : ''}
             {f.label}
           </button>
         ))}
-        <div className="flex items-center gap-2" style={{ marginLeft: '48px' }}>
+        <div className="filter-refresh flex items-center gap-2">
           <button
             onClick={handleRefresh}
             disabled={refreshing}
@@ -164,14 +187,14 @@ export default function Dashboard() {
           >
             &#x27F3;
           </button>
-          <span className="text-sm text-[#8494a7]">
+          <span className="refresh-label text-sm text-[#8494a7]">
             Refreshes every 20s
           </span>
         </div>
       </div>
 
       {/* Main content */}
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '1% 2% 2% 2%' }}>
+      <main className="main-content">
         {loading ? (
           <div className="text-center py-16 text-base text-[#6b7c93]">
             Loading The Swing&hellip;
@@ -183,15 +206,18 @@ export default function Dashboard() {
         ) : (
           <>
             {live.length > 0 && (
-              <div className="bg-[#f0f4f9] rounded-xl border border-[#dce6f0] mb-10" style={{ padding: '20px' }}>
-                <div className="flex items-center gap-3 mb-4">
+              <div className="section-pad bg-[#f0f4f9] rounded-xl border border-[#dce6f0] mb-10">
+                <div className="flex items-center gap-3" style={{ marginBottom: '10px' }}>
                   <div className="text-base font-bold text-[#C0392B] flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#C0392B] animate-pulse" />
                     In Progress
                   </div>
                   <div className="flex-1 h-px bg-[#ddd]" />
+                  <div className="text-sm text-[#1493ff]">
+                    Updated: <span className="font-mono">{lastUpdatedStr}</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-3.5">
+                <div className="game-grid">
                   {live.map((g) => (
                     <GameCard key={g.id} game={g} />
                   ))}
@@ -239,7 +265,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 h-px bg-[#ddd]" />
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-3.5 mb-10">
+                <div className="game-grid mb-10">
                   {final_.map((g) => (
                     <GameCard key={g.id} game={g} />
                   ))}
@@ -255,7 +281,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 h-px bg-[#ddd]" />
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-3.5 mb-10">
+                <div className="game-grid mb-10">
                   {pre.map((g) => (
                     <GameCard key={g.id} game={g} />
                   ))}
@@ -265,10 +291,6 @@ export default function Dashboard() {
           </>
         )}
 
-        {/* Last updated */}
-        <div className="text-sm text-[#6b7c93] text-center py-4">
-          Last updated: <span className="font-mono">{lastUpdatedStr}</span> &middot; Tick #{tick}
-        </div>
 
       </main>
     </div>

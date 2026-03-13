@@ -59,7 +59,7 @@ export default function GameCard({ game }) {
   }
 
   return (
-    <div className={borderClass} style={{ padding: '12px' }}>
+    <div className={`${borderClass} game-card-pad`}>
       {/* Top bar */}
       <div className="pb-3 mb-3 border-b border-black/5 flex justify-between items-center">
         <span className="text-sm font-semibold text-[#6b7c93]">
@@ -101,14 +101,14 @@ export default function GameCard({ game }) {
               <>
                 <div className="flex items-center justify-center gap-2">
                   <span
-                    className="font-mono text-5xl font-extrabold leading-none transition-colors duration-500"
+                    className="score-num font-mono font-extrabold leading-none transition-colors duration-500"
                     style={{ color: aColor }}
                   >
                     {g.awayScore}
                   </span>
-                  <span className="text-3xl font-bold text-[#8494a7]">&ndash;</span>
+                  <span className="score-dash font-bold text-[#8494a7]">&ndash;</span>
                   <span
-                    className="font-mono text-5xl font-extrabold leading-none transition-colors duration-500"
+                    className="score-num font-mono font-extrabold leading-none transition-colors duration-500"
                     style={{ color: hColor }}
                   >
                     {g.homeScore}
@@ -209,7 +209,7 @@ export default function GameCard({ game }) {
 
       {/* Alert strip */}
       {g.bluffing && (
-        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#C0392B] bg-red-50/50 rounded-b-xl">
+        <div className="alert-strip mt-3 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#C0392B] bg-red-50/50 rounded-b-xl">
           &#x26A1; Score is Bluffing &mdash;{' '}
           {g.awayScore > g.homeScore ? g.awayAbbr : g.homeAbbr} leads score,{' '}
           {g.mom.away > g.mom.home ? g.awayAbbr : g.homeAbbr} leads The Swing
@@ -219,7 +219,7 @@ export default function GameCard({ game }) {
         </div>
       )}
       {g.comeback && (
-        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#00C853] bg-green-50/50 rounded-b-xl">
+        <div className="alert-strip mt-3 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#00C853] bg-green-50/50 rounded-b-xl">
           &#x1F440; Comeback Watch &mdash;{' '}
           {g.awayScore < g.homeScore ? g.awayAbbr : g.homeAbbr} trails score but leads momentum
           {g.status === 'STATUS_HALFTIME' && (
@@ -228,7 +228,7 @@ export default function GameCard({ game }) {
         </div>
       )}
       {g.swingWarning && (
-        <div className="mt-3 -mx-8 px-8 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#FFD700] bg-yellow-50/50 rounded-b-xl">
+        <div className="alert-strip mt-3 py-3.5 border-t border-[#f0f0f0] text-base italic leading-snug text-[#FFD700] bg-yellow-50/50 rounded-b-xl">
           &#x26A0;&#xFE0F; Swing Warning &mdash; score is close but{' '}
           {g.mom.away > g.mom.home ? g.awayAbbr : g.homeAbbr} owns the momentum
           {g.status === 'STATUS_HALFTIME' && (
