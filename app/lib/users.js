@@ -44,7 +44,9 @@ export async function updateUser(id, data) {
         alert_swing_warning = COALESCE(${data.alertSwingWarning ?? null}, alert_swing_warning)
     WHERE id = ${id}::uuid
     RETURNING id, phone, first_name AS "firstName", last_name AS "lastName",
-              email, activated, created_at AS "createdAt"
+              email, activated, alert_bluffing AS "alertBluffing",
+              alert_comeback AS "alertComeback", alert_swing_warning AS "alertSwingWarning",
+              created_at AS "createdAt"
   `;
   return rows[0] || null;
 }

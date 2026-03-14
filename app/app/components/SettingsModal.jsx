@@ -36,7 +36,7 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
       if (!res.ok) throw new Error(data.error || 'Save failed');
       onUpdate(data.user);
       setSuccess('Settings saved!');
-      setTimeout(() => setSuccess(''), 2000);
+      setTimeout(() => onClose(), 1200);
     } catch (err) {
       setError(err.message);
     } finally {
