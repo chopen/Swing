@@ -9,7 +9,7 @@ import SportsNav from './SportsNav';
 import SettingsModal from './SettingsModal';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
-const REFRESH_MS = 20000;
+const REFRESH_MS = 10000;
 const FINAL_LINGER_MS = 5 * 60 * 1000; // 5 minutes
 
 export default function Dashboard() {
@@ -364,7 +364,7 @@ export default function Dashboard() {
             &#x27F3;
           </button>
           <span className="refresh-label text-sm text-[#8494a7]">
-            Refreshes every 20s
+            Refreshes every 10s
           </span>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>

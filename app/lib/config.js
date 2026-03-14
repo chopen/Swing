@@ -5,7 +5,7 @@ const path = require('path');
 module.exports = {
   DB_PATH: process.env.SWING_DB || path.join(__dirname, '..', '..', 'swing.db'),
 
-  POLL_INTERVAL: 20, // seconds
+  POLL_INTERVAL: 10, // seconds
 
   // ESPN API endpoints
   NBA_SCOREBOARD: 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
