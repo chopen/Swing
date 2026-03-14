@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
-import { verifyToken, getTokenFromCookies } from '../../../../lib/auth';
+import { cookies } from 'next/headers';
+import { verifyToken, getAuthCookie } from '../../../../lib/auth';
 import { findUserById, updateUser } from '../../../../lib/users';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
-    const token = await getTokenFromCookies();
+    const cookieStore = await cookies();
+    const token = getAuthCookie(cookieStore);
     if (!token) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     const payload = verifyToken(token);
