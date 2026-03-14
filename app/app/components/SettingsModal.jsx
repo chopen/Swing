@@ -63,9 +63,11 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
     width: '100%',
     maxWidth: '480px',
     maxHeight: '90vh',
-    overflow: 'auto',
+    overflow: 'hidden',
     position: 'relative',
     boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+    display: 'flex',
+    flexDirection: 'column',
   };
 
   const mobileModalStyle = {
@@ -80,12 +82,13 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
   const headerStyle = {
     background: '#001c55',
     color: '#fff',
-    padding: '20px 24px',
+    padding: 'clamp(10px, 2vh, 20px) 24px',
     borderRadius: isMobile ? 0 : '12px 12px 0 0',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     position: 'relative',
+    flexShrink: 0,
   };
 
   const closeBtnStyle = {
@@ -103,10 +106,10 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
 
   const inputStyle = {
     width: '100%',
-    padding: '10px 14px',
-    fontSize: '15px',
+    padding: '6px 10px',
+    fontSize: 'clamp(12px, 1.8vh, 15px)',
     border: '2px solid #dce6f0',
-    borderRadius: '8px',
+    borderRadius: '6px',
     outline: 'none',
     fontFamily: "'DM Sans', sans-serif",
     boxSizing: 'border-box',
@@ -114,13 +117,13 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
 
   const labelStyle = {
     display: 'block',
-    marginBottom: '4px',
-    fontSize: '13px',
+    marginBottom: '2px',
+    fontSize: 'clamp(11px, 1.5vh, 13px)',
     fontWeight: 600,
     color: '#001c55',
   };
 
-  const fieldGap = { marginBottom: '14px' };
+  const fieldGap = { marginBottom: 'clamp(6px, 1.5vh, 14px)' };
 
   const toggleStyle = (on) => ({
     width: '44px',
@@ -163,7 +166,7 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
           <div style={{ fontSize: '18px', fontWeight: 700 }}>Settings</div>
         </div>
 
-        <form onSubmit={handleSave} style={{ padding: '24px', position: 'relative' }}>
+        <form onSubmit={handleSave} style={{ padding: 'clamp(12px, 2vh, 24px)', position: 'relative', overflow: 'hidden' }}>
           {(error || success) && (
             <div style={{
               position: 'absolute',
@@ -184,7 +187,7 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
             </div>
           )}
           {/* Profile section */}
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#001c55', marginBottom: '12px' }}>
+          <div style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 700, color: '#001c55', marginBottom: 'clamp(6px, 1vh, 12px)' }}>
             Profile
           </div>
           <div style={fieldGap}>
@@ -228,13 +231,13 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
           </div>
 
           {/* Notification preferences */}
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#001c55', marginBottom: '12px', marginTop: '8px', borderTop: '1px solid #dce6f0', paddingTop: '16px' }}>
+          <div style={{ fontSize: 'clamp(13px, 1.8vh, 15px)', fontWeight: 700, color: '#001c55', marginBottom: 'clamp(6px, 1vh, 12px)', marginTop: '8px', borderTop: '1px solid #dce6f0', paddingTop: '16px' }}>
             Notification Preferences
           </div>
           <div style={{ ...fieldGap, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Bluffing Alerts</div>
-              <div style={{ fontSize: '12px', color: '#8494a7' }}>Score and momentum leaders disagree</div>
+              <div style={{ fontSize: 'clamp(12px, 1.6vh, 14px)', fontWeight: 600, color: '#222' }}>Bluffing Alerts</div>
+              <div style={{ fontSize: 'clamp(10px, 1.4vh, 12px)', color: '#8494a7' }}>Score and momentum leaders disagree</div>
             </div>
             <button type="button" onClick={() => setAlertBluffing(!alertBluffing)} style={toggleStyle(alertBluffing)}>
               <div style={toggleDot(alertBluffing)} />
@@ -242,8 +245,8 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
           </div>
           <div style={{ ...fieldGap, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Comeback Watch</div>
-              <div style={{ fontSize: '12px', color: '#8494a7' }}>Trailing team leads momentum</div>
+              <div style={{ fontSize: 'clamp(12px, 1.6vh, 14px)', fontWeight: 600, color: '#222' }}>Comeback Watch</div>
+              <div style={{ fontSize: 'clamp(10px, 1.4vh, 12px)', color: '#8494a7' }}>Trailing team leads momentum</div>
             </div>
             <button type="button" onClick={() => setAlertComeback(!alertComeback)} style={toggleStyle(alertComeback)}>
               <div style={toggleDot(alertComeback)} />
@@ -251,8 +254,8 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
           </div>
           <div style={{ ...fieldGap, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Swing Warning</div>
-              <div style={{ fontSize: '12px', color: '#8494a7' }}>Close score, one-sided momentum</div>
+              <div style={{ fontSize: 'clamp(12px, 1.6vh, 14px)', fontWeight: 600, color: '#222' }}>Swing Warning</div>
+              <div style={{ fontSize: 'clamp(10px, 1.4vh, 12px)', color: '#8494a7' }}>Close score, one-sided momentum</div>
             </div>
             <button type="button" onClick={() => setAlertSwingWarning(!alertSwingWarning)} style={toggleStyle(alertSwingWarning)}>
               <div style={toggleDot(alertSwingWarning)} />
@@ -264,17 +267,17 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '14px 24px',
+              padding: 'clamp(8px, 1.5vh, 14px) 24px',
               background: '#1493ff',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
-              fontSize: '16px',
+              fontSize: 'clamp(13px, 2vh, 16px)',
               fontWeight: 700,
               cursor: 'pointer',
               fontFamily: "'DM Sans', sans-serif",
               opacity: loading ? 0.6 : 1,
-              marginTop: '8px',
+              marginTop: 'clamp(4px, 1vh, 8px)',
             }}
           >
             {loading ? 'Saving...' : 'Save Settings'}
