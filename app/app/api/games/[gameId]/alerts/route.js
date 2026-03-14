@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server';
-import db from '../../../../../lib/db';
 
-export async function GET(request, { params }) {
-  const { gameId } = await params;
-  const database = db.initDb();
+export const dynamic = 'force-dynamic';
 
-  const rows = database
-    .prepare('SELECT * FROM alerts WHERE game_id = ? ORDER BY detected_at')
-    .all(gameId);
-
-  return NextResponse.json(rows);
+export async function GET() {
+  return NextResponse.json({ message: 'This endpoint is deprecated. Use /api/poll instead.' });
 }
