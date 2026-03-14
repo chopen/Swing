@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from './db.js';
 
 export async function findUserByPhone(phone) {
   const { rows } = await sql`

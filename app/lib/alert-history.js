@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from './db.js';
 
 export async function wasAlertSentRecently(userId, gameId, alertType, withinMs = 3 * 60 * 1000) {
   const intervalSeconds = Math.floor(withinMs / 1000);

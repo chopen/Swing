@@ -1,7 +1,26 @@
-import { sql } from '@vercel/postgres';
+import pg from 'pg';
+
+let pool;
+
+function getPool() {
+  if (!pool) {
+    pool = new pg.Pool({
+      connectionString: process.env.POSTGRES_URL,
+    });
+  }
+  return pool;
+}
+
+// Template tag that mimics @vercel/postgres sql`` interface
+export function sql(strings, ...values) {
+  const text = strings.reduce((acc, str, i) => {
+    return acc + str + (i < values.length ? `$${i + 1}` : '');
+  }, '');
+  return getPool().query(text, values);
+}
 
 export function getDb() {
-  return sql;
+  return { sql };
 }
 
 export async function initDb() {
@@ -20,7 +39,6 @@ export async function initDb() {
     )
   `;
 
-  // Add columns if they don't exist (for existing databases)
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_bluffing BOOLEAN DEFAULT true`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_comeback BOOLEAN DEFAULT true`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_swing_warning BOOLEAN DEFAULT true`;
