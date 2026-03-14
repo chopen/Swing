@@ -168,17 +168,17 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
             <div style={{
               position: 'absolute',
               top: '8px',
-              left: '24px',
-              right: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
               background: error ? '#dc2626' : '#16a34a',
               color: '#fff',
-              padding: '10px 16px',
+              padding: '10px 20px',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: 600,
               zIndex: 10,
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-              textAlign: 'center',
+              whiteSpace: 'nowrap',
             }}>
               {error || success}
             </div>
