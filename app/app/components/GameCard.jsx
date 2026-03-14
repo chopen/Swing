@@ -225,6 +225,7 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
             isLive={isLive}
+            league={g.league}
           />
 
           <PlayFeed

@@ -1,8 +1,22 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 
-export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr, isLive }) {
+function formatGameTime(point, league) {
+  if (!point) return '';
+  const p = point.p;
+  const c = point.c || '';
+  if (!p) return c;
+  if (league === 'NBA') {
+    const label = p <= 4 ? `Q${p}` : `OT${p > 5 ? p - 4 : ''}`;
+    return `${label} ${c}`;
+  }
+  // CBB — 2 halves
+  const label = p === 1 ? '1st Half' : p === 2 ? '2nd Half' : `OT${p > 3 ? p - 2 : ''}`;
+  return `${label} ${c}`;
+}
+
+export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr, isLive, league }) {
   const [tooltip, setTooltip] = useState(null);
   const svgRef = useRef(null);
   const tooltipTimer = useRef(null);
@@ -113,7 +127,7 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
   const awayProjVal = projectValue(awayTrend, projSteps);
   const homeProjVal = projectValue(homeTrend, projSteps);
 
-  const handleChartClick = useCallback((e) => {
+  const handleChartClick = (e) => {
     if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     const clickXRatio = (e.clientX - rect.left) / rect.width;
@@ -168,12 +182,7 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
     const awayVal = chartAway[closestIdx].v;
     const homeVal = chartHome[closestIdx].v;
 
-    const time = new Date(chartAway[closestIdx].t).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-    });
+    const time = formatGameTime(chartAway[closestIdx], league);
 
     if (Math.abs(awayVal - homeVal) <= 2) {
       setTooltip({ dual: true, away: { team: awayAbbr, val: awayVal, color: awayColor }, home: { team: homeAbbr, val: homeVal, color: homeColor }, time, leftPct });
@@ -188,7 +197,7 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
     }
     clearTimeout(tooltipTimer.current);
     tooltipTimer.current = setTimeout(() => setTooltip(null), 3000);
-  }, [n, chartAway, chartHome, awayAbbr, homeAbbr, awayColor, homeColor, isLive, forecastX, awayTrend, homeTrend, projSteps, yMin, yMax]);
+  };
 
   return (
     <div className="pb-3 pt-3 border-t border-[#f0f0f0]" style={{ position: 'relative' }}>
