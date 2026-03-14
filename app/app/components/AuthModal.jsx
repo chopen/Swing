@@ -10,6 +10,8 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [userId, setUserId] = useState(null);
+  const [code, setCode] = useState('');
+  const [pendingSigninData, setPendingSigninData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +57,7 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
     }
   };
 
-  const handleSignin = async (e) => {
+  const handleSigninPhone = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -63,7 +65,7 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone, step: 'request' }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Sign in failed');
@@ -71,9 +73,30 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
         setUserId(data.userId);
         setMode('register-complete');
       } else {
-        onAuth(data.user);
-        onClose();
+        setPendingSigninData(data);
+        setMode('verify-code');
       }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, step: 'verify', code }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid code');
+      onAuth(data.user);
+      onClose();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -179,6 +202,7 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
 
   const titleMap = {
     signin: 'Sign In',
+    'verify-code': 'Enter Verification Code',
     'register-phone': 'Get Alerts',
     'register-complete': 'Complete Your Profile',
   };
@@ -223,7 +247,7 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
           )}
 
           {mode === 'signin' && (
-            <form onSubmit={handleSignin}>
+            <form onSubmit={handleSigninPhone}>
               <div style={fieldGap}>
                 <label style={labelStyle}>Phone Number</label>
                 <input
@@ -237,7 +261,7 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
                 />
               </div>
               <button type="submit" disabled={loading} style={buttonStyle}>
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? 'Sending code...' : 'Continue'}
               </button>
               <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px', color: '#6b7c93' }}>
                 Don&apos;t have an account?{' '}
@@ -247,6 +271,40 @@ export default function AuthModal({ mode: initialMode, onClose, onAuth }) {
                   style={{ background: 'none', border: 'none', color: '#1493ff', fontWeight: 600, cursor: 'pointer', fontSize: '14px', fontFamily: "'DM Sans', sans-serif" }}
                 >
                   Sign Up
+                </button>
+              </div>
+            </form>
+          )}
+
+          {mode === 'verify-code' && (
+            <form onSubmit={handleVerifyCode}>
+              <div style={{ marginBottom: '12px', fontSize: '14px', color: '#6b7c93' }}>
+                We sent a verification code to your phone. Enter it below.
+              </div>
+              <div style={fieldGap}>
+                <label style={labelStyle}>Verification Code</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="456789"
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                  style={{ ...inputStyle, textAlign: 'center', fontSize: '24px', letterSpacing: '8px', fontWeight: 700 }}
+                  required
+                  autoFocus
+                />
+              </div>
+              <button type="submit" disabled={loading || code.length !== 6} style={{ ...buttonStyle, opacity: (loading || code.length !== 6) ? 0.6 : 1 }}>
+                {loading ? 'Verifying...' : 'Verify'}
+              </button>
+              <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px', color: '#6b7c93' }}>
+                <button
+                  type="button"
+                  onClick={() => { setMode('signin'); setError(''); setCode(''); }}
+                  style={{ background: 'none', border: 'none', color: '#1493ff', fontWeight: 600, cursor: 'pointer', fontSize: '14px', fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Back
                 </button>
               </div>
             </form>
