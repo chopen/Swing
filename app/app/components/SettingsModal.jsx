@@ -163,32 +163,28 @@ export default function SettingsModal({ user, onClose, onUpdate }) {
           <div style={{ fontSize: '18px', fontWeight: 700 }}>Settings</div>
         </div>
 
-        <form onSubmit={handleSave} style={{ padding: '24px' }}>
-          {error && (
-            <div style={{
-              background: '#fef2f2',
-              color: '#dc2626',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              marginBottom: '16px',
-            }}>
-              {error}
-            </div>
-          )}
-          {success && (
-            <div style={{
-              background: '#f0fdf4',
-              color: '#16a34a',
-              padding: '10px 14px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              marginBottom: '16px',
-            }}>
-              {success}
-            </div>
-          )}
+        {/* Toast notifications */}
+        {(error || success) && (
+          <div style={{
+            position: 'absolute',
+            top: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: error ? '#dc2626' : '#16a34a',
+            color: '#fff',
+            padding: '10px 20px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 600,
+            zIndex: 10000,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            whiteSpace: 'nowrap',
+          }}>
+            {error || success}
+          </div>
+        )}
 
+        <form onSubmit={handleSave} style={{ padding: '24px' }}>
           {/* Profile section */}
           <div style={{ fontSize: '15px', fontWeight: 700, color: '#001c55', marginBottom: '12px' }}>
             Profile
