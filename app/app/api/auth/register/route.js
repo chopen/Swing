@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
-import { readUsers, writeUsers, findUserByPhone } from '../../../../lib/users';
+import { findUserByPhone, createUser } from '../../../../lib/users';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,24 +14,12 @@ export async function POST(request) {
     const cleanPhone = phone.replace(/\D/g, '');
 
     // Check if user already exists
-    const existing = findUserByPhone(cleanPhone);
+    const existing = await findUserByPhone(cleanPhone);
     if (existing) {
       return NextResponse.json({ userId: existing.id, existing: true });
     }
 
-    const user = {
-      id: randomUUID(),
-      phone: cleanPhone,
-      firstName: null,
-      lastName: null,
-      email: null,
-      activated: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    const users = readUsers();
-    users.push(user);
-    writeUsers(users);
+    const user = await createUser(cleanPhone);
 
     return NextResponse.json({ userId: user.id });
   } catch (err) {

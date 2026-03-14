@@ -63,7 +63,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const subscriptions = readSubscriptions();
+    const subscriptions = await readSubscriptions();
 
     if (subscriptions.length === 0) {
       return NextResponse.json({ sent: [], message: 'No active subscriptions' });
@@ -88,13 +88,13 @@ export async function GET() {
       const game = gameMap.get(sub.gameId);
       if (!game) continue;
 
-      const user = findUserById(sub.userId);
+      const user = await findUserById(sub.userId);
       if (!user) continue;
 
       for (const alertType of ALERT_TYPES) {
         if (!game[alertType]) continue;
 
-        if (wasAlertSentRecently(sub.userId, sub.gameId, alertType)) continue;
+        if (await wasAlertSentRecently(sub.userId, sub.gameId, alertType)) continue;
 
         const message = ALERT_MESSAGES[alertType](game);
         const shortName = game.shortName || game.name || sub.gameId;
@@ -103,7 +103,7 @@ export async function GET() {
           `[SMS] To: ${user.phone} | Game: ${shortName} | Alert: ${alertType} | Message: ${message}`
         );
 
-        recordAlert(sub.userId, sub.gameId, alertType);
+        await recordAlert(sub.userId, sub.gameId, alertType);
         alertsSent.push({
           userId: sub.userId,
           phone: user.phone,

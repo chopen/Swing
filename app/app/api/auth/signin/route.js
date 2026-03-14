@@ -14,7 +14,7 @@ export async function POST(request) {
     }
 
     const cleanPhone = phone.replace(/\D/g, '');
-    const user = findUserByPhone(cleanPhone);
+    const user = await findUserByPhone(cleanPhone);
 
     if (!user) {
       return NextResponse.json({ error: 'No account found with that phone number' }, { status: 404 });

@@ -19,7 +19,7 @@ export async function GET() {
       return NextResponse.json({ gameIds: [] });
     }
 
-    const subs = findSubscriptionsByUser(payload.userId);
+    const subs = await findSubscriptionsByUser(payload.userId);
     const gameIds = subs.map((s) => s.gameId);
 
     return NextResponse.json({ gameIds });

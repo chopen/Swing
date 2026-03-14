@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { readUsers, writeUsers, findUserById } from '../../../../lib/users';
+import { findUserById, updateUser } from '../../../../lib/users';
 import { createToken, setAuthCookie } from '../../../../lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -13,24 +13,23 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    const users = readUsers();
-    const idx = users.findIndex((u) => u.id === userId);
-
-    if (idx === -1) {
+    const existing = await findUserById(userId);
+    if (!existing) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    users[idx].firstName = firstName.trim();
-    users[idx].lastName = lastName.trim();
-    users[idx].email = email.trim();
-    users[idx].activated = true;
-    writeUsers(users);
+    const user = await updateUser(userId, {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      activated: true,
+    });
 
-    const token = createToken(users[idx]);
+    const token = createToken(user);
     const cookieStore = await cookies();
     setAuthCookie(cookieStore, token);
 
-    return NextResponse.json({ success: true, user: { id: users[idx].id, firstName: users[idx].firstName } });
+    return NextResponse.json({ success: true, user: { id: user.id, firstName: user.firstName } });
   } catch (err) {
     console.error('Complete error:', err);
     return NextResponse.json({ error: 'Completion failed' }, { status: 500 });

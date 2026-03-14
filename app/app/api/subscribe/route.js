@@ -26,13 +26,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'gameId is required' }, { status: 400 });
     }
 
-    const existing = findSubscription(payload.userId, gameId);
+    const existing = await findSubscription(payload.userId, gameId);
 
     if (existing) {
-      removeSubscription(payload.userId, gameId);
+      await removeSubscription(payload.userId, gameId);
       return NextResponse.json({ subscribed: false });
     } else {
-      addSubscription(payload.userId, gameId);
+      await addSubscription(payload.userId, gameId);
       return NextResponse.json({ subscribed: true });
     }
   } catch (err) {

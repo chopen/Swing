@@ -1,40 +1,21 @@
-import fs from 'fs';
-import path from 'path';
+import { sql } from '@vercel/postgres';
 
-const HISTORY_FILE = path.join(process.cwd(), 'data', 'alert-history.json');
-
-export function readAlertHistory() {
-  try {
-    const data = fs.readFileSync(HISTORY_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+export async function wasAlertSentRecently(userId, gameId, alertType, withinMs = 3 * 60 * 1000) {
+  const intervalSeconds = Math.floor(withinMs / 1000);
+  const { rows } = await sql`
+    SELECT 1 FROM alert_history
+    WHERE user_id = ${userId}::uuid
+      AND game_id = ${gameId}
+      AND alert_type = ${alertType}
+      AND sent_at > now() - make_interval(secs => ${intervalSeconds})
+    LIMIT 1
+  `;
+  return rows.length > 0;
 }
 
-export function writeAlertHistory(history) {
-  fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));
-}
-
-export function findAlertsByUserAndGame(userId, gameId) {
-  return readAlertHistory().filter(
-    (a) => a.userId === userId && a.gameId === gameId
-  );
-}
-
-export function wasAlertSentRecently(userId, gameId, alertType, withinMs = 3 * 60 * 1000) {
-  const now = Date.now();
-  return readAlertHistory().some(
-    (a) =>
-      a.userId === userId &&
-      a.gameId === gameId &&
-      a.alertType === alertType &&
-      now - new Date(a.sentAt).getTime() < withinMs
-  );
-}
-
-export function recordAlert(userId, gameId, alertType) {
-  const history = readAlertHistory();
-  history.push({ userId, gameId, alertType, sentAt: new Date().toISOString() });
-  writeAlertHistory(history);
+export async function recordAlert(userId, gameId, alertType) {
+  await sql`
+    INSERT INTO alert_history (user_id, game_id, alert_type)
+    VALUES (${userId}::uuid, ${gameId}, ${alertType})
+  `;
 }

@@ -1,25 +1,43 @@
-import fs from 'fs';
-import path from 'path';
+import { sql } from '@vercel/postgres';
 
-const USERS_FILE = path.join(process.cwd(), 'data', 'users.json');
-
-export function readUsers() {
-  try {
-    const data = fs.readFileSync(USERS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+export async function findUserByPhone(phone) {
+  const { rows } = await sql`
+    SELECT id, phone, first_name AS "firstName", last_name AS "lastName",
+           email, activated, created_at AS "createdAt"
+    FROM users WHERE phone = ${phone}
+  `;
+  return rows[0] || null;
 }
 
-export function writeUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+export async function findUserById(id) {
+  const { rows } = await sql`
+    SELECT id, phone, first_name AS "firstName", last_name AS "lastName",
+           email, activated, created_at AS "createdAt"
+    FROM users WHERE id = ${id}::uuid
+  `;
+  return rows[0] || null;
 }
 
-export function findUserById(id) {
-  return readUsers().find((u) => u.id === id) || null;
+export async function createUser(phone) {
+  const { rows } = await sql`
+    INSERT INTO users (phone)
+    VALUES (${phone})
+    RETURNING id, phone, first_name AS "firstName", last_name AS "lastName",
+              email, activated, created_at AS "createdAt"
+  `;
+  return rows[0];
 }
 
-export function findUserByPhone(phone) {
-  return readUsers().find((u) => u.phone === phone) || null;
+export async function updateUser(id, data) {
+  const { rows } = await sql`
+    UPDATE users
+    SET first_name = COALESCE(${data.firstName ?? null}, first_name),
+        last_name  = COALESCE(${data.lastName ?? null}, last_name),
+        email      = COALESCE(${data.email ?? null}, email),
+        activated  = COALESCE(${data.activated ?? null}, activated)
+    WHERE id = ${id}::uuid
+    RETURNING id, phone, first_name AS "firstName", last_name AS "lastName",
+              email, activated, created_at AS "createdAt"
+  `;
+  return rows[0] || null;
 }
