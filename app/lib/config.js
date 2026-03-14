@@ -36,9 +36,12 @@ module.exports = {
     fastBreak: 2.5,
   },
 
-  // Normalization range
+  // Normalization range (CBB)
   RAW_MIN: -15,
   RAW_MAX: 15,
+  // NBA wider raw range — higher shooting %, more 3s, fewer turnovers
+  NBA_RAW_MIN: -22,
+  NBA_RAW_MAX: 22,
   NORM_MIN: 5,
   NORM_MAX: 95,
 

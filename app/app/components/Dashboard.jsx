@@ -173,15 +173,16 @@ export default function Dashboard() {
     return periodsLeft * periodMins * 60 + clockSecs;
   }
 
-  // Group live games by league, sort within each group, reorder groups every 15 min
-  const liveUnsorted = filtered.filter(isLiveOrLingering);
-  const nbaLive = liveUnsorted.filter((g) => g.league === 'NBA').sort((a, b) => timeRemaining(a) - timeRemaining(b));
-  const cbbLive = liveUnsorted.filter((g) => g.league === 'CBB').sort((a, b) => timeRemaining(a) - timeRemaining(b));
+  // Sort by league (CBB first) then by time remaining within each league
+  function sortByLeagueAndTime(arr) {
+    const cbb = arr.filter((g) => g.league === 'CBB').sort((a, b) => timeRemaining(a) - timeRemaining(b));
+    const nba = arr.filter((g) => g.league === 'NBA').sort((a, b) => timeRemaining(a) - timeRemaining(b));
+    return [...cbb, ...nba];
+  }
 
-  const live = [...cbbLive, ...nbaLive];
-
-  const pre = filtered.filter((g) => g.status === 'STATUS_SCHEDULED');
-  const final_ = filtered.filter(isTrulyFinal);
+  const live = sortByLeagueAndTime(filtered.filter(isLiveOrLingering));
+  const pre = sortByLeagueAndTime(filtered.filter((g) => g.status === 'STATUS_SCHEDULED'));
+  const final_ = sortByLeagueAndTime(filtered.filter(isTrulyFinal));
 
   const timeStr = currentTime
     ? currentTime.toLocaleTimeString('en-US', {

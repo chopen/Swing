@@ -1,6 +1,6 @@
 /** The Swing — Momentum engine (matches JS in index.html exactly). */
 
-const { WINDOW, MAX_CHART_POINTS, WEIGHTS, RAW_MIN, RAW_MAX, NORM_MIN, NORM_MAX } = require('./config');
+const { WINDOW, MAX_CHART_POINTS, WEIGHTS, RAW_MIN, RAW_MAX, NBA_RAW_MIN, NBA_RAW_MAX, NORM_MIN, NORM_MAX } = require('./config');
 
 function resolveTeam(playTeam, awayAbbr, homeAbbr, awayId, homeId) {
   if (!playTeam) return null;
@@ -44,9 +44,11 @@ function scorePossession(play) {
   return score;
 }
 
-function toMomentum(raw) {
-  const clamped = Math.max(RAW_MIN, Math.min(RAW_MAX, raw));
-  return Math.round(NORM_MIN + ((clamped - RAW_MIN) / (RAW_MAX - RAW_MIN)) * (NORM_MAX - NORM_MIN));
+function toMomentum(raw, league) {
+  const rMin = league === 'NBA' ? NBA_RAW_MIN : RAW_MIN;
+  const rMax = league === 'NBA' ? NBA_RAW_MAX : RAW_MAX;
+  const clamped = Math.max(rMin, Math.min(rMax, raw));
+  return Math.round(NORM_MIN + ((clamped - rMin) / (rMax - rMin)) * (NORM_MAX - NORM_MIN));
 }
 
 function trimChart(arr) {
@@ -55,7 +57,7 @@ function trimChart(arr) {
   return Array.from({ length: MAX_CHART_POINTS }, (_, i) => arr[Math.floor(i * step)]);
 }
 
-function computeMomentumFromPlays(plays, awayAbbr, homeAbbr, awayId, homeId) {
+function computeMomentumFromPlays(plays, awayAbbr, homeAbbr, awayId, homeId, league) {
   if (!plays || plays.length === 0) return null;
 
   const teamedPlays = plays.filter((p) => resolveTeam(p.team, awayAbbr, homeAbbr, awayId, homeId));
@@ -93,8 +95,8 @@ function computeMomentumFromPlays(plays, awayAbbr, homeAbbr, awayId, homeId) {
     if (i % 5 === 0) {
       const rawAway = awayWindow.reduce((a, b) => a + b, 0);
       const rawHome = homeWindow.reduce((a, b) => a + b, 0);
-      const awayM = toMomentum(rawAway);
-      const homeM = toMomentum(rawHome);
+      const awayM = toMomentum(rawAway, league);
+      const homeM = toMomentum(rawHome, league);
       chartAway.push({
         t: play.wallclock,
         p: play.period?.number,
@@ -129,8 +131,8 @@ function computeMomentumFromPlays(plays, awayAbbr, homeAbbr, awayId, homeId) {
 
   const rawAway = awayWindow.reduce((a, b) => a + b, 0);
   const rawHome = homeWindow.reduce((a, b) => a + b, 0);
-  const awayM = toMomentum(rawAway);
-  const homeM = toMomentum(rawHome);
+  const awayM = toMomentum(rawAway, league);
+  const homeM = toMomentum(rawHome, league);
 
   const recentPlays = teamedPlays
     .slice(-8)

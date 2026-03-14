@@ -67,7 +67,8 @@ async function buildPollData() {
             g.awayAbbr,
             g.homeAbbr,
             g.awayId,
-            g.homeId
+            g.homeId,
+            g.league
           );
           // Cache momentum permanently once game is final
           if (g.status === 'STATUS_FINAL') {
