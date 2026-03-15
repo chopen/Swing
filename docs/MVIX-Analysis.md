@@ -272,9 +272,73 @@ The 10-game rolling `avgUpMagnitude` matches actual win-rate as a predictor at 7
 - MVIX is derived from the same momentum engine weights for all analysis — changing weights would change results
 - NBA-specific normalization (wider raw range) may affect cross-league comparisons
 
-### Next Steps
+## Case Study: Vanderbilt vs Arkansas — CBB MVIX Profile Comparison (2026 Season)
+
+This example demonstrates using MVIX to build a season-long team profile and compare two teams head-to-head. Analysis covers all 2026 calendar year games through March 14 (12 games for VAN, 9 for ARK).
+
+### Vanderbilt (VAN) — 8-4, MVIX avg 54
+
+| Date | Opponent | Result | MVIX | UpI | DnI | AvgUp | AvgDn |
+|---|---|---|---|---|---|---|---|
+| Jan 3 | @ SC | W 83-71 | 55 | 10 | 12 | 11.6 | 10.4 |
+| Jan 10 | LSU | W 84-73 | 37 | 5 | 12 | 9.6 | 6.2 |
+| Jan 17 | FLA | L 94-98 | 86 | 11 | 10 | 8.4 | 7.7 |
+| Jan 24 | MSST | W 88-56 | 50 | 9 | 8 | 15.8 | 7.9 |
+| Jan 31 | MISS | W 71-68 | 31 | 4 | 8 | 9.5 | 10.6 |
+| Feb 7 | OU | L 91-92 | 56 | 12 | 9 | 11.7 | 7.2 |
+| Feb 14 | TA&M | W 82-69 | 61 | 11 | 12 | 10.1 | 10.2 |
+| Feb 21 | TENN | L 65-69 | 62 | 11 | 11 | 12.9 | 8.9 |
+| Feb 28 | UK | L 77-91 | 33 | 11 | 11 | 11.4 | 8.2 |
+| Mar 7 | TENN | W 86-82 | 100 | 12 | 13 | 7.7 | 5.2 |
+| Mar 13 | TENN | W 75-68 | 43 | 13 | 13 | 7.9 | 7.9 |
+| Mar 14 | FLA | W 91-74 | 35 | 9 | 8 | 9.1 | 11.0 |
+
+**Season averages:** MVIX 54.1, avgUpMagnitude 10.47, upInflections 9.83, downInflections 10.58
+
+**Win/loss split:** In wins MVIX 51.5 / avgUp 10.16. In losses MVIX 59.3 / avgUp 11.10.
+
+**Trend:** Rolling 3-game avgUpMagnitude dropped from 11+ early season to 8.2 in final 3 games — VAN became significantly more controlled and efficient in their momentum late in the season.
+
+### Arkansas (ARK) — 6-3, MVIX avg 53
+
+| Date | Opponent | Result | MVIX | UpI | DnI | AvgUp | AvgDn |
+|---|---|---|---|---|---|---|---|
+| Jan 3 | TENN | W 86-75 | 47 | 8 | 13 | 15.0 | 9.5 |
+| Jan 10 | @ AUB | L 73-95 | 66 | 7 | 15 | 11.1 | 7.3 |
+| Jan 17 | UGA | L 76-90 | 59 | 10 | 12 | 13.5 | 8.7 |
+| Jan 24 | LSU | W 85-81 | 47 | 11 | 13 | 10.3 | 7.2 |
+| Jan 31 | UK | L 77-85 | 48 | 10 | 12 | 9.5 | 3.7 |
+| Feb 7 | MSST | W 88-68 | 50 | 8 | 10 | 13.1 | 10.0 |
+| Feb 21 | MIZ | W 94-86 | 37 | 7 | 9 | 11.7 | 8.7 |
+| Mar 7 | MIZ | W 88-84 | 93 | 10 | 10 | 11.6 | 7.8 |
+| Mar 14 | MISS | W 93-90 | 33 | 8 | 10 | 10.9 | 7.0 |
+
+**Season averages:** MVIX 53.3, avgUpMagnitude 11.86, upInflections 8.78, downInflections 11.56
+
+**Win/loss split:** In wins MVIX 51.2 / avgUp 12.10 / bias -7.0. In losses MVIX 57.7 / avgUp 11.38 / mvixUp 62.3 / bias +20.67.
+
+**Key pattern:** When ARK loses, their `mvixUp` spikes to 62.3 and `bias` surges to +20.67 — classic "desperation momentum" where the team swings wildly upward but cannot sustain it.
+
+### Head-to-Head Comparison
+
+| Metric | VAN | ARK | Edge (per NBA findings) |
+|---|---|---|---|
+| mvix | 54.08 | 53.33 | ARK (lower = calmer) |
+| avgUpMagnitude | 10.47 | 11.86 | VAN (lower = more efficient) |
+| upInflections | 9.83 | 8.78 | ARK (fewer = more controlled) |
+| downInflections | 10.58 | 11.56 | VAN (fewer = more stable) |
+| bias | -12.58 | 2.22 | ARK (closer to neutral) |
+
+**Conclusion:** Near toss-up on MVIX fundamentals. Both teams average ~53 MVIX. VAN has the edge on momentum efficiency (lower avgUpMagnitude — doesn't need big runs). ARK has the edge on fewer upward inflections but needs larger surges when they do swing up. VAN's late-season trend (rolling avgUp dropping from 11+ to 8.2) suggests they are peaking in momentum control heading into postseason play.
+
+### Methodology Note
+
+This CBB analysis uses the same MVIX framework validated on 182 NBA games. The predictive findings (rolling avgUpMagnitude at 73.1% accuracy) were established on NBA data. CBB-specific validation with a larger sample would strengthen confidence in cross-league applicability.
+
+## Next Steps
 
 - Backfill analysis across a full NBA season for larger sample size
 - Test whether MVIX adds predictive value on top of point spreads or Elo ratings
 - Explore in-game rolling MVIX as a live betting signal
 - Consider team-matchup-specific MVIX interactions
+- Validate rolling MVIX predictive power on CBB with larger sample
