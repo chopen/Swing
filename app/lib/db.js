@@ -62,4 +62,29 @@ export async function initDb() {
       sent_at TIMESTAMP DEFAULT now()
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS team_mvix (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      team VARCHAR(10) NOT NULL,
+      league VARCHAR(10) NOT NULL,
+      game_id VARCHAR(100) NOT NULL,
+      game_date DATE NOT NULL,
+      won BOOLEAN,
+      score VARCHAR(20),
+      mvix INTEGER,
+      mvix_up INTEGER,
+      mvix_down INTEGER,
+      bias INTEGER,
+      up_inflections INTEGER,
+      down_inflections INTEGER,
+      avg_up_magnitude REAL,
+      avg_down_magnitude REAL,
+      rolling_avg_up_magnitude REAL,
+      rolling_mvix REAL,
+      games_in_rolling INTEGER DEFAULT 1,
+      created_at TIMESTAMP DEFAULT now(),
+      UNIQUE(team, game_id)
+    )
+  `;
 }
