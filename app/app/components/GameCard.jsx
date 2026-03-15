@@ -164,7 +164,7 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             <div className="text-sm text-[#8494a7] mt-0.5">{g.awayName?.split(' ').pop()}</div>
             {g.rolling3Away && (
               <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
-                Last {g.rolling3Away.games}gm MVIX: <span style={{ fontWeight: 700, color: g.mvixAway?.bias > 5 ? '#00C853' : g.mvixAway?.bias < -5 ? '#C0392B' : '#FFD700' }}>{g.rolling3Away.mvix}</span>
+                Last {g.rolling3Away.games}gm MVIX: <span style={{ fontWeight: 700, color: g.rolling3Away.mvix < 40 ? '#00C853' : g.rolling3Away.mvix > 65 ? '#C0392B' : '#FFD700' }}>{g.rolling3Away.mvix}</span>
               </div>
             )}
           </div>
@@ -207,7 +207,7 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             <div className="text-sm text-[#8494a7] mt-0.5">{g.homeName?.split(' ').pop()}</div>
             {g.rolling3Home && (
               <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
-                Last {g.rolling3Home.games}gm MVIX: <span style={{ fontWeight: 700, color: g.mvixHome?.bias > 5 ? '#00C853' : g.mvixHome?.bias < -5 ? '#C0392B' : '#FFD700' }}>{g.rolling3Home.mvix}</span>
+                Last {g.rolling3Home.games}gm MVIX: <span style={{ fontWeight: 700, color: g.rolling3Home.mvix < 40 ? '#00C853' : g.rolling3Home.mvix > 65 ? '#C0392B' : '#FFD700' }}>{g.rolling3Home.mvix}</span>
               </div>
             )}
           </div>
