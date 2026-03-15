@@ -161,7 +161,12 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             >
               {g.awayAbbr}
             </div>
-            <div className="text-sm text-[#8494a7] mt-0.5">{g.awayName}</div>
+            <div className="text-sm text-[#8494a7] mt-0.5">{g.awayName?.split(' ').pop()}</div>
+            {g.rolling3Away && (
+              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
+                Last {g.rolling3Away.games}gm MVIX: <span style={{ fontWeight: 700, color: g.mvixAway?.bias > 5 ? '#00C853' : g.mvixAway?.bias < -5 ? '#C0392B' : '#FFD700' }}>{g.rolling3Away.mvix}</span>
+              </div>
+            )}
           </div>
 
           {/* Center score */}
@@ -199,7 +204,12 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             >
               {g.homeAbbr}
             </div>
-            <div className="text-sm text-[#8494a7] mt-0.5">{g.homeName}</div>
+            <div className="text-sm text-[#8494a7] mt-0.5">{g.homeName?.split(' ').pop()}</div>
+            {g.rolling3Home && (
+              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
+                Last {g.rolling3Home.games}gm MVIX: <span style={{ fontWeight: 700, color: g.mvixHome?.bias > 5 ? '#00C853' : g.mvixHome?.bias < -5 ? '#C0392B' : '#FFD700' }}>{g.rolling3Home.mvix}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -267,6 +277,8 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             homeAbbr={g.homeAbbr}
             isLive={isLive}
             league={g.league}
+            mvixAway={g.mvixAway}
+            mvixHome={g.mvixHome}
           />
 
           <PlayFeed

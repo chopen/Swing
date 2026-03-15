@@ -115,6 +115,25 @@ export async function recordGameMvix(team, league, gameId, gameDate, won, score,
 }
 
 /**
+ * Get 3-game rolling MVIX for a team, excluding a specific game.
+ */
+export async function getRolling3Excluding(team, league, excludeGameId) {
+  const { rows } = await sql`
+    SELECT mvix, avg_up_magnitude AS "avgUpMagnitude"
+    FROM team_mvix
+    WHERE team = ${team} AND league = ${league} AND game_id != ${excludeGameId}
+    ORDER BY game_date DESC
+    LIMIT 3
+  `;
+  if (rows.length === 0) return null;
+  const avgMvix = rows.reduce((s, r) => s + r.mvix, 0) / rows.length;
+  return {
+    mvix: Math.round(avgMvix * 10) / 10,
+    games: rows.length,
+  };
+}
+
+/**
  * Get rolling MVIX for all teams (for leaderboard/comparison).
  */
 export async function getAllTeamRollings(league) {

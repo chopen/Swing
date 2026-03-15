@@ -11,7 +11,7 @@ const {
 const { computeMomentumFromPlays } = require('../../../lib/momentum');
 const { detectAlerts } = require('../../../lib/alerts');
 import { computeGameVolatility } from '../../../lib/mvix';
-import { recordGameMvix } from '../../../lib/team-mvix';
+import { recordGameMvix, getRolling3Excluding } from '../../../lib/team-mvix';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
 const CACHE_TTL = 10_000; // 10 seconds
@@ -20,6 +20,7 @@ let cachedResponse = null;
 let cacheTimestamp = 0;
 let fetchInFlight = null;
 const finalMomCache = new Map(); // gameId -> momentum data (never changes once final)
+const rolling3Cache = new Map(); // gameId -> { away, home } rolling 3-game MVIX
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +79,31 @@ async function buildPollData() {
           }
         }
       }
+    }
+
+    // Compute live MVIX for games with momentum data
+    if (g.mom?.chartAway && g.mom?.chartHome) {
+      const vol = computeGameVolatility(g.mom.chartAway, g.mom.chartHome, g.league);
+      if (vol) {
+        g.mvixAway = vol.away;
+        g.mvixHome = vol.home;
+      }
+    }
+
+    // Attach historical 3-game rolling MVIX (cached per game)
+    if (g.mom && !rolling3Cache.has(g.id)) {
+      try {
+        const [awayR, homeR] = await Promise.all([
+          getRolling3Excluding(g.awayAbbr, g.league, g.id),
+          getRolling3Excluding(g.homeAbbr, g.league, g.id),
+        ]);
+        rolling3Cache.set(g.id, { away: awayR, home: homeR });
+      } catch {}
+    }
+    const r3 = rolling3Cache.get(g.id);
+    if (r3) {
+      g.rolling3Away = r3.away;
+      g.rolling3Home = r3.home;
     }
 
     const alerts = detectAlerts(g);

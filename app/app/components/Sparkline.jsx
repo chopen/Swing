@@ -16,7 +16,7 @@ function formatGameTime(point, league) {
   return `${label} ${c}`;
 }
 
-export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr, isLive, league }) {
+export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, awayAbbr, homeAbbr, isLive, league, mvixAway, mvixHome }) {
   const [tooltip, setTooltip] = useState(null);
   const svgRef = useRef(null);
   const tooltipTimer = useRef(null);
@@ -199,9 +199,10 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
     const score = awayScore != null && homeScore != null ? { awayAbbr, awayScore, homeAbbr, homeScore } : null;
 
     const time = formatGameTime(chartAway[closestIdx], league);
+    const mvix = mvixAway && mvixHome ? { away: mvixAway, home: mvixHome } : null;
 
     if (Math.abs(awayVal - homeVal) <= 2) {
-      setTooltip({ dual: true, away: { team: awayAbbr, val: awayVal, color: awayColor }, home: { team: homeAbbr, val: homeVal, color: homeColor }, time, score, leftPct });
+      setTooltip({ dual: true, away: { team: awayAbbr, val: awayVal, color: awayColor }, home: { team: homeAbbr, val: homeVal, color: homeColor }, time, score, mvix, leftPct });
     } else {
       const awayY = toY(awayVal);
       const homeY = toY(homeVal);
@@ -209,7 +210,8 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
       const team = isAway ? awayAbbr : homeAbbr;
       const color = isAway ? awayColor : homeColor;
       const val = isAway ? awayVal : homeVal;
-      setTooltip({ team, val, time, score, color, leftPct });
+      const teamMvix = isAway ? mvixAway : mvixHome;
+      setTooltip({ team, val, time, score, mvix: teamMvix, color, leftPct });
     }
     clearTimeout(tooltipTimer.current);
     tooltipTimer.current = setTimeout(() => setTooltip(null), 5000);
@@ -393,6 +395,7 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
           </div>
           <div style={{ textAlign: 'center', fontSize: '13px', color: '#6b7c93', marginTop: '4px' }}>{tooltip.time}</div>
           {tooltip.score && <div style={{ textAlign: 'center', fontSize: '12px' }}><span style={{ color: awayColor, fontWeight: 700 }}>{tooltip.score.awayAbbr}</span> {tooltip.score.awayScore} - <span style={{ color: homeColor, fontWeight: 700 }}>{tooltip.score.homeAbbr}</span> {tooltip.score.homeScore}</div>}
+          {tooltip.mvix && !tooltip.mvix.away && <div style={{ textAlign: 'center', fontSize: '11px', color: '#8494a7', marginTop: '2px' }}>MVIX {tooltip.mvix.mvix} &middot; bias {tooltip.mvix.bias > 0 ? '+' : ''}{tooltip.mvix.bias}</div>}
           <div style={{
             position: 'absolute',
             bottom: '-7px',
@@ -442,6 +445,7 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
           </div>
           <div style={{ textAlign: 'center', fontSize: '13px', color: '#6b7c93', marginTop: '4px' }}>{tooltip.time}</div>
           {tooltip.score && <div style={{ textAlign: 'center', fontSize: '12px' }}><span style={{ color: awayColor, fontWeight: 700 }}>{tooltip.score.awayAbbr}</span> {tooltip.score.awayScore} - <span style={{ color: homeColor, fontWeight: 700 }}>{tooltip.score.homeAbbr}</span> {tooltip.score.homeScore}</div>}
+          {tooltip.mvix && tooltip.mvix.away && <div style={{ textAlign: 'center', fontSize: '11px', color: '#8494a7', marginTop: '2px' }}>MVIX: <span style={{ color: awayColor }}>{tooltip.mvix.away.mvix}</span> / <span style={{ color: homeColor }}>{tooltip.mvix.home.mvix}</span></div>}
           <div style={{
             position: 'absolute',
             bottom: '-7px',
@@ -464,6 +468,39 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
             borderRight: '6px solid transparent',
             borderTop: '6px solid #fff',
           }} />
+        </div>
+      )}
+
+      {/* MVIX Meter */}
+      {mvixAway && mvixHome && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', padding: '0 2px' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: awayColor, minWidth: '30px', textAlign: 'right', lineHeight: 1 }}>{awayAbbr}</span>
+            <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative' }}>
+              <div style={{
+                width: `${Math.min(100, mvixAway.mvix)}%`,
+                height: '100%',
+                borderRadius: '3px',
+                background: mvixAway.bias > 5 ? '#00C853' : mvixAway.bias < -5 ? '#C0392B' : '#FFD700',
+                transition: 'width 1s ease-out',
+              }} />
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', textAlign: 'right', lineHeight: 1 }}>{mvixAway.mvix}</span>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#8494a7', whiteSpace: 'nowrap', lineHeight: 1 }}>Live MVIX</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', lineHeight: 1 }}>{mvixHome.mvix}</span>
+            <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative', direction: 'rtl' }}>
+              <div style={{
+                width: `${Math.min(100, mvixHome.mvix)}%`,
+                height: '100%',
+                borderRadius: '3px',
+                background: mvixHome.bias > 5 ? '#00C853' : mvixHome.bias < -5 ? '#C0392B' : '#FFD700',
+                transition: 'width 1s ease-out',
+              }} />
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: homeColor, minWidth: '30px', lineHeight: 1 }}>{homeAbbr}</span>
+          </div>
         </div>
       )}
     </div>
