@@ -26,6 +26,8 @@ export default function Dashboard() {
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState('signin');
   const [showSettings, setShowSettings] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const rootRef = useRef(null);
   const timerRef = useRef(null);
   const clockRef = useRef(null);
   const finalTimestamps = useRef({});
@@ -119,6 +121,34 @@ export default function Dashboard() {
     await fetchData();
     setRefreshing(false);
   };
+
+  const toggleFullscreen = useCallback(async () => {
+    if (isFullscreen) {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen().catch(() => {});
+      }
+      try { screen.orientation.unlock(); } catch {}
+      setIsFullscreen(false);
+    } else {
+      const el = rootRef.current;
+      if (el?.requestFullscreen) {
+        await el.requestFullscreen().catch(() => {});
+      }
+      try { await screen.orientation.lock('landscape'); } catch {}
+      setIsFullscreen(true);
+    }
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handleChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+        try { screen.orientation.unlock(); } catch {}
+      }
+    };
+    document.addEventListener('fullscreenchange', handleChange);
+    return () => document.removeEventListener('fullscreenchange', handleChange);
+  }, []);
 
   const allGames = games;
   const now = Date.now();
@@ -215,11 +245,20 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen bg-[#eaf0f6]"
+      ref={rootRef}
+      className={`min-h-screen bg-[#eaf0f6]${isFullscreen ? ' swing-fullscreen' : ''}`}
       style={{ fontFamily: "'DM Sans', sans-serif", color: '#222' }}
     >
+      {/* Fullscreen exit button */}
+      {isFullscreen && (
+        <button onClick={toggleFullscreen} className="swing-fs-exit" title="Exit fullscreen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+          </svg>
+        </button>
+      )}
       {/* Header */}
-      <header className="header-main bg-[#001c55] border-b-[3px] border-[#1493ff] sticky top-0 z-[200]">
+      {!isFullscreen && <header className="header-main bg-[#001c55] border-b-[3px] border-[#1493ff] sticky top-0 z-[200]">
         <div className="flex items-center" style={{ gap: '16px' }}>
           <Image
             src="/swing-logo.jpg"
@@ -333,13 +372,13 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </header>
+      </header>}
 
       {/* Sports nav */}
-      <SportsNav />
+      {!isFullscreen && <SportsNav />}
 
       {/* Filter tabs */}
-      <div className="filter-bar bg-white border-b border-[#dce6f0]">
+      {!isFullscreen && <div className="filter-bar bg-white border-b border-[#dce6f0]">
         {filters.map((f) => (
           <button
             key={f.key}
@@ -383,8 +422,21 @@ export default function Dashboard() {
           >
             CLV
           </button>
+          {(filter === 'LIVE' || filter === 'ALL') && <>
+            <div style={{ width: '1px', height: '24px', background: '#dce6f0' }} />
+            <button
+              onClick={toggleFullscreen}
+              title="Fullscreen mode"
+              className="border-none rounded-lg cursor-pointer transition-all duration-150 bg-transparent text-[#001c55] hover:bg-[#dce6f0]"
+              style={{ padding: '6px 10px', display: 'flex', alignItems: 'center' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+              </svg>
+            </button>
+          </>}
         </div>
-      </div>
+      </div>}
 
       {/* Main content */}
       <main className="main-content">
@@ -460,12 +512,12 @@ export default function Dashboard() {
                     Updated: <span className="font-mono">{lastUpdatedStr}</span>
                   </div>
                 </div>
-                <div className="game-grid">
+                <div className={isFullscreen ? "game-grid-fullscreen" : "game-grid"}>
                   {live.map((g) => (
                     <GameCard key={g.id} game={g} user={user} subscribedGames={subscribedGames} onToggleSubscribe={handleToggleSubscribe} onRequestAuth={() => openAuth('register-phone')} />
                   ))}
                   {/* Legend card */}
-                  <div className="bg-white rounded-xl border border-[#dce6f0] flex flex-col justify-center" style={{ padding: '12px' }}>
+                  {!isFullscreen && <div className="bg-white rounded-xl border border-[#dce6f0] flex flex-col justify-center" style={{ padding: '12px' }}>
                     <div className="flex flex-col items-center" style={{ marginBottom: '12px' }}>
                       <Image src="/swing-logo.jpg" alt="" width={96} height={96} className="rounded-full" style={{ background: '#fff', marginBottom: '8px' }} />
                       <div className="text-xl font-bold text-[#1493ff]">
@@ -498,7 +550,7 @@ export default function Dashboard() {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div>}
                 </div>
               </div>
             )}
@@ -511,7 +563,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 h-px bg-[#ddd]" />
                 </div>
-                <div className="game-grid mb-10">
+                <div className={isFullscreen ? "game-grid-fullscreen mb-10" : "game-grid mb-10"}>
                   {final_.map((g) => (
                     <GameCard key={g.id} game={g} user={user} subscribedGames={subscribedGames} onToggleSubscribe={handleToggleSubscribe} onRequestAuth={() => openAuth('register-phone')} />
                   ))}
@@ -527,7 +579,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 h-px bg-[#ddd]" />
                 </div>
-                <div className="game-grid mb-10">
+                <div className={isFullscreen ? "game-grid-fullscreen mb-10" : "game-grid mb-10"}>
                   {pre.map((g) => (
                     <GameCard key={g.id} game={g} user={user} subscribedGames={subscribedGames} onToggleSubscribe={handleToggleSubscribe} onRequestAuth={() => openAuth('register-phone')} />
                   ))}
@@ -540,7 +592,7 @@ export default function Dashboard() {
 
       </main>
 
-      <Footer />
+      {!isFullscreen && <Footer />}
 
       {showAuth && (
         <AuthModal
