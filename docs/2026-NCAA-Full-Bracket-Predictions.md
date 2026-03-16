@@ -1,188 +1,163 @@
-# 2026 NCAA Tournament Full Bracket Predictions — MVIX + MRVI
+# 2026 NCAA Tournament Bracket — Pure MVIX + MRVI Predictions
 
-## Predicted Champion: (6) North Carolina defeats (3) Gonzaga, 78-75
+## Predicted Champion: (6) UNC defeats (12) UNI, 78-75
+
+## Final Four: UNI, GONZ, UNC, SLU
 
 ## Methodology
 
-- **MRVI** (Rolling 5-game) weighted 2x — best CBB predictor at 61.1% (270 games)
-- **MVIX** (Rolling 10-game) weighted 1x — lower = calmer/more controlled
-- Seed used as tiebreaker when metrics are unavailable or equal
-- Predictions based purely on momentum volatility profiles — does not account for matchups, injuries, or venue
+Predictions use two momentum signals:
 
----
-
-## Round of 32 (Round 2)
-
-| Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
-|---|---|---|---|---|---|---|---|
-| EAST | (1) DUKE vs (8) OSU | 50 | 53 | 59 | n/a | **DUKE** | MVIX DUKE |
-| EAST | (4) KU vs (12) UNI | 49 | 42 | 43 | n/a | **UNI** | MVIX UNI |
-| EAST | (3) MSU vs (11) USF | 56 | 45 | 47 | n/a | **USF** | MVIX USF |
-| EAST | (2) CONN vs (7) UCLA | 48 | n/a | 48 | 51 | **CONN** | seed |
-| WEST | (1) ARIZ vs (9) USU | 68 | n/a | 62 | n/a | **USU** | MVIX USU |
-| WEST | (4) ARK vs (5) WIS | 51 | n/a | 50 | n/a | **WIS** | MVIX WIS |
-| WEST | (3) GONZ vs (6) BYU | 40 | 53 | 58 | n/a | **GONZ** | MVIX GONZ |
-| WEST | (2) PUR vs (7) MIA | 56 | n/a | 54 | n/a | **MIA** | MVIX MIA |
-| SOUTH | (1) FLA vs (8) CLEM | 51 | n/a | 58 | 46 | **FLA** | MVIX FLA |
-| SOUTH | (4) NEB vs (5) VAN | 44 | n/a | 62 | n/a | **NEB** | MVIX NEB |
-| SOUTH | (3) ILL vs (6) UNC | 53 | 47 | 40 | 58 | **UNC** | MRVI UNC, MVIX UNC |
-| SOUTH | (2) HOU vs (7) SMC | 52 | n/a | 35 | 54 | **SMC** | MVIX SMC |
-| MIDWEST | (1) MICH vs (9) SLU | 49 | n/a | 52 | 57 | **MICH** | MVIX MICH |
-| MIDWEST | (4) ALA vs (12) AKR | 68 | 50 | 51 | 54 | **AKR** | MRVI AKR, MVIX AKR |
-| MIDWEST | (3) UVA vs (6) TENN | 55 | 50 | 52 | 53 | **TENN** | MRVI TENN, MVIX TENN |
-| MIDWEST | (2) ISU vs (7) UK | 49 | 52 | 61 | n/a | **ISU** | MVIX ISU |
-
-### Round 2 Upsets Predicted
-
-| Upset | Over | Signal |
+| Signal | Weight | Description |
 |---|---|---|
-| (12) UNI over (4) KU | MVIX 43 vs 49 — Northern Iowa calmer |
-| (11) USF over (3) MSU | MVIX 47 vs 56 — South Florida more controlled |
-| (9) USU over (1) ARIZ | MVIX 62 vs 68 — Arizona most volatile top seed |
-| (7) MIA over (2) PUR | MVIX 54 vs 56 — Miami slightly calmer |
-| (7) SMC over (2) HOU | MVIX 35 vs 52 — Saint Mary's far calmer, has MRVI 54 |
-| (12) AKR over (4) ALA | Both metrics favor Akron — Alabama MVIX 68 very volatile |
+| **MRVI** (Rolling 5-game) | 2x | Direction of volatility — higher = trending favorably (61.1% CBB accuracy) |
+| **MVIX** (Rolling 10-game) | 1x | Magnitude of volatility — lower = calmer/more controlled |
+
+Seed used as tiebreaker when metrics are equal or unavailable.
+
+**Close-metrics rule:** When the combined MVIX + MRVI difference between two teams is less than 6, the higher-seeded team receives a 2x weight bonus. This prevents the model from picking upsets based on negligible metric differences.
 
 ---
 
-## Sweet 16 (Round 3)
+## Round of 64 (First Round)
 
 | Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
 |---|---|---|---|---|---|---|---|
-| EAST | (1) DUKE vs (12) UNI | 50 | 53 | 43 | n/a | **UNI** | MVIX UNI |
-| EAST | (11) USF vs (2) CONN | 47 | n/a | 48 | n/a | **USF** | MVIX USF |
-| WEST | (9) USU vs (5) WIS | 62 | n/a | 50 | n/a | **WIS** | MVIX WIS |
-| WEST | (3) GONZ vs (7) MIA | 40 | 53 | 54 | n/a | **GONZ** | MVIX GONZ |
-| SOUTH | (1) FLA vs (4) NEB | 51 | n/a | 44 | n/a | **NEB** | MVIX NEB |
-| SOUTH | (6) UNC vs (7) SMC | 40 | 58 | 35 | 54 | **UNC** | MRVI UNC, MVIX SMC |
-| MIDWEST | (1) MICH vs (12) AKR | 49 | n/a | 51 | 54 | **MICH** | MVIX MICH |
-| MIDWEST | (6) TENN vs (2) ISU | 52 | 53 | 49 | 52 | **TENN** | MRVI TENN, MVIX ISU |
+| EAST | (1) DUKE vs (16) SIE | 50 | 50 | 46 | 52 | **SIE** | MRVI SIE, MVIX SIE |
+| EAST | (2) CONN vs (15) FUR | 50 | 47 | 67 | 51 | **FUR** | MRVI FUR, MVIX CONN |
+| EAST | (3) MSU vs (14) NDSU | 58 | 47 | 43 | 50 | **NDSU** | MRVI NDSU, MVIX NDSU |
+| EAST | (4) KU vs (13) CBU | 49 | 46 | 54 | 53 | **CBU** | MRVI CBU, MVIX KU |
+| EAST | (5) SJU vs (12) UNI | 47 | 50 | 46 | 54 | **UNI** | MRVI UNI, MVIX UNI, close metrics, seed favor (5) |
+| EAST | (6) LOU vs (11) USF | 60 | 52 | 48 | 54 | **USF** | MRVI USF, MVIX USF |
+| EAST | (7) UCLA vs (10) UCF | 48 | 48 | 56 | 43 | **UCLA** | MRVI UCLA, MVIX UCLA |
+| EAST | (8) OSU vs (9) TCU | 56 | 54 | 53 | 47 | **OSU** | MRVI OSU, MVIX TCU |
+| WEST | (1) ARIZ vs (16) LIU | 68 | 43 | 56 | 49 | **LIU** | MRVI LIU, MVIX LIU |
+| WEST | (2) PUR vs (15) QUC | 56 | 47 | 60 | 52 | **QUC** | MRVI QUC, MVIX PUR |
+| WEST | (3) GONZ vs (14) KENN | 50 | 53 | 67 | 47 | **GONZ** | MRVI GONZ, MVIX GONZ |
+| WEST | (4) ARK vs (13) HAW | 50 | 53 | 56 | 51 | **ARK** | MRVI ARK, MVIX ARK |
+| WEST | (5) WIS vs (12) HPU | 50 | 53 | 54 | 51 | **WIS** | MRVI WIS, MVIX WIS, close metrics, seed favor (5) |
+| WEST | (6) BYU vs (11) SMU | 58 | 53 | 54 | 52 | **BYU** | MRVI BYU, MVIX SMU, close metrics, seed favor (6) |
+| WEST | (7) MIA vs (10) MIZ | 55 | 52 | 50 | 43 | **MIA** | MRVI MIA, MVIX MIZ |
+| WEST | (8) VILL vs (9) USU | 57 | 46 | 66 | 53 | **USU** | MRVI USU, MVIX VILL |
+| SOUTH | (1) FLA vs (16) HOW | 49 | 50 | 60 | 46 | **FLA** | MRVI FLA, MVIX FLA |
+| SOUTH | (2) HOU vs (15) IDHO | 52 | 51 | 59 | 50 | **HOU** | MRVI HOU, MVIX HOU |
+| SOUTH | (3) ILL vs (14) PENN | 61 | 47 | 57 | 50 | **PENN** | MRVI PENN, MVIX PENN |
+| SOUTH | (4) NEB vs (13) TROY | 45 | 48 | 45 | 51 | **NEB** | MRVI TROY, MVIX NEB, close metrics, seed favor (4) |
+| SOUTH | (5) VAN vs (12) MCN | 62 | 53 | 53 | 48 | **VAN** | MRVI VAN, MVIX MCN |
+| SOUTH | (6) UNC vs (11) VCU | 40 | 57 | 54 | 51 | **UNC** | MRVI UNC, MVIX UNC |
+| SOUTH | (7) SMC vs (10) TA&M | 47 | 54 | 50 | 46 | **SMC** | MRVI SMC, MVIX SMC |
+| SOUTH | (8) CLEM vs (9) IOWA | 58 | 46 | 62 | 42 | **CLEM** | MRVI CLEM, MVIX CLEM |
+| MIDWEST | (1) MICH vs (16) UMBC | 49 | 50 | 48 | 51 | **UMBC** | MRVI UMBC, MVIX UMBC, close metrics, seed favor (1) |
+| MIDWEST | (2) ISU vs (15) TNST | 49 | 53 | 61 | 46 | **ISU** | MRVI ISU, MVIX ISU |
+| MIDWEST | (3) UVA vs (14) WRST | 58 | 51 | 65 | 47 | **UVA** | MRVI UVA, MVIX UVA |
+| MIDWEST | (4) ALA vs (13) HOF | 68 | 50 | 58 | 52 | **HOF** | MRVI HOF, MVIX HOF |
+| MIDWEST | (5) TTU vs (12) AKR | 66 | 47 | 50 | 54 | **AKR** | MRVI AKR, MVIX AKR |
+| MIDWEST | (6) TENN vs (11) TEX | 50 | 52 | 55 | 46 | **TENN** | MRVI TENN, MVIX TENN |
+| MIDWEST | (7) UK vs (10) SCU | 61 | 50 | 48 | 47 | **UK** | MRVI UK, MVIX SCU |
+| MIDWEST | (8) UGA vs (9) SLU | 56 | 46 | 53 | 57 | **SLU** | MRVI SLU, MVIX SLU |
 
-### Sweet 16 Key Matchups
+### First Round Upsets Predicted
 
-**UNC vs SMC** — The two best MVIX profiles in the tournament collide. UNC wins on MRVI (58 vs 54) despite SMC having the lower MVIX (35 vs 40). Direction of volatility breaks the tie.
+| Pick | Seed | Over Seed |
+|---|---|---|
+| **SIE** | 16 | 1 |
+| **FUR** | 15 | 2 |
+| **NDSU** | 14 | 3 |
+| **CBU** | 13 | 4 |
+| **UNI** | 12 | 5 |
+| **USF** | 11 | 6 |
+| **LIU** | 16 | 1 |
+| **QUC** | 15 | 2 |
+| **USU** | 9 | 8 |
+| **PENN** | 14 | 3 |
+| **UMBC** | 16 | 1 |
+| **HOF** | 13 | 4 |
+| **AKR** | 12 | 5 |
+| **SLU** | 9 | 8 |
 
-**TENN vs ISU** — MRVI narrowly favors Tennessee (53 vs 52), MVIX narrowly favors Iowa State (49 vs 52). MRVI weighted 2x gives Tennessee the edge.
 
 ---
 
-## Elite 8 (Round 4 — Regional Finals)
+## Round of 32 (Second Round)
 
 | Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
 |---|---|---|---|---|---|---|---|
-| EAST | (12) UNI vs (11) USF | 43 | n/a | 47 | n/a | **UNI** | MVIX UNI |
-| WEST | (5) WIS vs (3) GONZ | 50 | n/a | 40 | 53 | **GONZ** | MVIX GONZ |
-| SOUTH | (4) NEB vs (6) UNC | 44 | n/a | 40 | 58 | **UNC** | MVIX UNC |
-| MIDWEST | (1) MICH vs (6) TENN | 49 | n/a | 52 | 53 | **MICH** | MVIX MICH |
+| EAST | (16) SIE vs (8) OSU | 46 | 52 | 56 | 54 | **OSU** | MRVI OSU, MVIX SIE |
+| EAST | (13) CBU vs (12) UNI | 54 | 53 | 46 | 54 | **UNI** | MRVI UNI, MVIX UNI |
+| EAST | (14) NDSU vs (11) USF | 43 | 50 | 48 | 54 | **USF** | MRVI USF, MVIX NDSU |
+| EAST | (15) FUR vs (7) UCLA | 67 | 51 | 48 | 48 | **FUR** | MRVI FUR, MVIX UCLA |
+| WEST | (16) LIU vs (9) USU | 56 | 49 | 66 | 53 | **USU** | MRVI USU, MVIX LIU |
+| WEST | (4) ARK vs (5) WIS | 50 | 53 | 50 | 53 | **ARK** | MVIX ARK, close metrics, seed favor (4) |
+| WEST | (3) GONZ vs (6) BYU | 50 | 53 | 58 | 53 | **GONZ** | MVIX GONZ |
+| WEST | (15) QUC vs (7) MIA | 60 | 52 | 55 | 52 | **MIA** | MRVI MIA, MVIX MIA |
+| SOUTH | (1) FLA vs (8) CLEM | 49 | 50 | 58 | 46 | **FLA** | MRVI FLA, MVIX FLA |
+| SOUTH | (4) NEB vs (5) VAN | 45 | 48 | 62 | 53 | **VAN** | MRVI VAN, MVIX NEB |
+| SOUTH | (14) PENN vs (6) UNC | 57 | 50 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC |
+| SOUTH | (2) HOU vs (7) SMC | 52 | 51 | 47 | 54 | **SMC** | MRVI SMC, MVIX SMC |
+| MIDWEST | (16) UMBC vs (9) SLU | 48 | 51 | 53 | 57 | **SLU** | MRVI SLU, MVIX UMBC |
+| MIDWEST | (13) HOF vs (12) AKR | 58 | 52 | 50 | 54 | **AKR** | MRVI AKR, MVIX AKR |
+| MIDWEST | (3) UVA vs (6) TENN | 58 | 51 | 50 | 52 | **TENN** | MRVI TENN, MVIX TENN |
+| MIDWEST | (2) ISU vs (7) UK | 49 | 53 | 61 | 50 | **ISU** | MRVI ISU, MVIX ISU |
+
+---
+
+## Sweet 16
+
+| Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
+|---|---|---|---|---|---|---|---|
+| EAST | (8) OSU vs (12) UNI | 56 | 54 | 46 | 54 | **UNI** | MRVI UNI, MVIX UNI |
+| EAST | (11) USF vs (15) FUR | 48 | 54 | 67 | 51 | **USF** | MRVI USF, MVIX USF |
+| WEST | (9) USU vs (4) ARK | 66 | 53 | 50 | 53 | **ARK** | MRVI ARK, MVIX ARK |
+| WEST | (3) GONZ vs (7) MIA | 50 | 53 | 55 | 52 | **GONZ** | MRVI GONZ, MVIX GONZ, close metrics, seed favor (3) |
+| SOUTH | (1) FLA vs (5) VAN | 49 | 50 | 62 | 53 | **VAN** | MRVI VAN, MVIX FLA |
+| SOUTH | (6) UNC vs (7) SMC | 40 | 57 | 47 | 54 | **UNC** | MRVI UNC, MVIX UNC |
+| MIDWEST | (9) SLU vs (12) AKR | 53 | 57 | 50 | 54 | **SLU** | MRVI SLU, MVIX AKR, close metrics, seed favor (9) |
+| MIDWEST | (6) TENN vs (2) ISU | 50 | 52 | 49 | 53 | **ISU** | MRVI ISU, MVIX ISU, close metrics, seed favor (2) |
+
+---
+
+## Elite 8 (Regional Finals)
+
+| Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
+|---|---|---|---|---|---|---|---|
+| EAST | (12) UNI vs (11) USF | 46 | 54 | 48 | 54 | **UNI** | MRVI UNI, MVIX UNI, close metrics, seed favor (11) |
+| WEST | (4) ARK vs (3) GONZ | 50 | 53 | 50 | 53 | **GONZ** | MRVI GONZ, close metrics, seed favor (3) |
+| SOUTH | (5) VAN vs (6) UNC | 62 | 53 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC |
+| MIDWEST | (9) SLU vs (2) ISU | 53 | 57 | 49 | 53 | **SLU** | MRVI SLU, MVIX ISU |
 
 ### Regional Champions
 
-| Region | Champion | Seed | MVIX | MRVI | Path |
-|---|---|---|---|---|---|
-| EAST | **Northern Iowa** | 12 | 43 | n/a | UNI → KU → DUKE → USF |
-| WEST | **Gonzaga** | 3 | 40 | 53 | GONZ → BYU → MIA → WIS |
-| SOUTH | **North Carolina** | 6 | 40 | 58 | UNC → VCU → ILL → SMC → NEB |
-| MIDWEST | **Michigan** | 1 | 49 | n/a | MICH → SLU → AKR → TENN |
+| Region | Champion | Seed | MVIX | MRVI |
+|---|---|---|---|---|
+| EAST | **UNI** | 12 | 46 | 54 |
+| WEST | **GONZ** | 3 | 50 | 53 |
+| SOUTH | **UNC** | 6 | 40 | 57 |
+| MIDWEST | **SLU** | 9 | 53 | 57 |
+
 
 ---
 
 ## Final Four
 
-| Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
-|---|---|---|---|---|---|---|
-| (12) UNI vs (3) GONZ | 43 | n/a | 40 | 53 | **GONZ** | MVIX GONZ |
-| (6) UNC vs (1) MICH | 40 | 58 | 49 | n/a | **UNC** | MVIX UNC |
-
-**Gonzaga** advances with the best combined profile in the Final Four — lowest MVIX (40) and strong MRVI (53). Calm, controlled, with momentum trending favorably.
-
-**North Carolina** advances with the tournament's best MRVI (58) and matching low MVIX (40). The Tar Heels' volatility consistently works in their favor.
+| Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
+|---|---|---|---|---|---|---|---|
+| FF | (12) UNI vs (3) GONZ | 46 | 54 | 50 | 53 | **UNI** | MRVI UNI, MVIX UNI, close metrics, seed favor (3) |
+| FF | (6) UNC vs (9) SLU | 40 | 57 | 53 | 57 | **UNC** | MRVI UNC, MVIX UNC |
 
 ---
 
 ## National Championship
 
-### (3) Gonzaga vs (6) North Carolina
+| Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
+|---|---|---|---|---|---|---|---|
+| CHAMP | (12) UNI vs (6) UNC | 46 | 54 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC |
 
-| Metric | Gonzaga | UNC |
-|---|---|---|
-| MVIX | 40 | 40 |
-| MRVI | 53 | 58 |
-| Profile | Calm + favorable | Calm + strongly favorable |
-
-**Predicted Winner: (6) North Carolina 78, (3) Gonzaga 75**
-
-Both teams share the tournament's lowest MVIX (40) — calm, controlled basketball. The difference is MRVI: UNC's 58 vs Gonzaga's 53. North Carolina's volatility trends more upward — when momentum swings happen, they swing in UNC's favor more consistently.
-
-This is a close game between two teams with elite momentum profiles. The 3-point margin reflects the narrow MRVI edge.
+### Predicted Final: (6) UNC 78, (12) UNI 75
 
 ---
 
-## Full Bracket Path to Championship
-
-```
-EAST                    WEST                    SOUTH                   MIDWEST
-(1) DUKE                (1) ARIZ                (1) FLA                 (1) MICH
-     DUKE                    USU                      FLA                     MICH
-(8) OSU                 (9) USU                 (8) CLEM                (9) SLU
-                             USU → WIS                                       MICH
-(4) KU                  (4) ARK                 (4) NEB                 (4) ALA
-     UNI                     WIS                      NEB                     AKR
-(12) UNI                (5) WIS                 (5) VAN                 (12) AKR
-          UNI                     WIS                  NEB                    MICH
-(3) MSU                 (3) GONZ                (3) ILL                 (3) UVA
-     USF                     GONZ                     UNC                     TENN
-(11) USF                (6) BYU                 (6) UNC                 (6) TENN
-                             GONZ                                            TENN
-(2) CONN                (2) PUR                 (2) HOU                 (2) ISU
-     CONN                    MIA                      SMC                     ISU
-(7) UCLA                (7) MIA                 (7) SMC                 (7) UK
-
-E8: UNI                 E8: GONZ                E8: UNC                 E8: MICH
-
-         FINAL FOUR                      FINAL FOUR
-         GONZ over UNI                   UNC over MICH
-
-                    CHAMPIONSHIP
-                    UNC 78, GONZ 75
-
-                    🏆 NORTH CAROLINA
-```
-
----
-
-## Teams with Best Momentum Profiles (Tournament Field)
-
-| Rank | Team | Seed | MVIX | MRVI | Combo | Assessment |
-|---|---|---|---|---|---|---|
-| 1 | **Saint Mary's** | S-7 | 35 | 54 | Elite | Lowest MVIX in field — eliminated by UNC |
-| 2 | **UNC** | S-6 | 40 | 58 | Elite | Best MRVI — predicted champion |
-| 3 | **Gonzaga** | W-3 | 40 | 53 | Elite | Co-lowest MVIX — predicted finalist |
-| 4 | **Northern Iowa** | E-12 | 43 | n/a | Strong | Cinderella — calm mid-major |
-| 5 | **Nebraska** | S-4 | 44 | n/a | Strong | Calm profile, South region dark horse |
-
-## Teams Most Vulnerable to Early Exit
-
-| Team | Seed | MVIX | MRVI | Risk |
-|---|---|---|---|---|
-| **Arizona** | W-1 | 73 | 43 | Predicted R2 loss to USU — most volatile 1-seed |
-| **Texas Tech** | MW-5 | 71 | 47 | Predicted R1 loss to Akron — very chaotic |
-| **Alabama** | MW-4 | 68 | 50 | Predicted R2 loss to Akron — high volatility |
-| **Vanderbilt** | S-5 | 62 | 53 | MRVI helps but MVIX too high |
-| **Kentucky** | MW-7 | 62 | 50 | Volatile with neutral momentum direction |
-
----
-
-## Methodology Notes
-
-- Rolling MVIX: last 10 games (or fewer if insufficient history)
-- Rolling MRVI: last 5 games with MRVI data (CBB only)
-- MRVI weighted 2x over MVIX per 1,220-game CBB validation
-- Seed tiebreaker when both metrics unavailable
-- "n/a" MRVI means fewer than 3 games with MRVI data available for that team
-- Many teams lack MRVI data because their earlier season games didn't have enough chart data points for the 8-point rolling stddev computation
-- Predicted championship score (78-75) based on each team's 10-game scoring average with winner adjustment
-- Analysis generated March 16, 2026 using data through March 15
+## Analysis generated March 16, 2026 using full 90-day MVIX/MRVI backfill (7,946 CBB records, 100% MRVI coverage)
 
 ## Disclaimer
 
-These predictions are based solely on momentum volatility metrics (MVIX/MRVI) derived from play-by-play data. They do not account for team talent, coaching, matchup specifics, injuries, venue advantages, or any other traditional basketball analytics. The model predicts several highly unlikely upsets (e.g., 12-seed in the Final Four) because it measures momentum patterns, not team quality. Use as one signal among many, not as sole prediction basis.
+These predictions are based on momentum volatility metrics derived from play-by-play data. They do not account for injuries, venue, travel, or external team quality ratings. Use as one analytical signal among many.
