@@ -45,3 +45,4 @@ swing.db-shm
 app/.next/
 app/out/
 .vercel
+mvix-data.json
