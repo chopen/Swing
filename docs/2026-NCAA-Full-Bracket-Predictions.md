@@ -2,7 +2,7 @@
 
 ## Predicted Champion: (6) UNC defeats (12) UNI, 78-75
 
-## Final Four: UNI, GONZ, UNC, MICH
+## Final Four: UNI, GONZ, UNC, ISU
 
 ## Methodology
 
@@ -11,8 +11,7 @@
 | **MRVI** | 2x |
 | **MVIX** | 1x |
 
-**Top seed protection:** 1 and 2 seeds receive 2.5x seed weight bonus.
-**Close-metrics rule:** When combined MVIX + MRVI difference < 8, higher seed gets 2x bonus.
+**Top seed protection (R1, R2, S16 only):** 1/2 seeds receive 2.5x weight. Close-metrics rule active. Both removed from Elite 8 onward — metrics decide.
 
 ---
 
@@ -99,33 +98,34 @@
 | SOUTH | (6) UNC vs (7) SMC | 40 | 57 | 47 | 54 | **UNC** | MRVI UNC, MVIX UNC |
 | MIDWEST | (1) MICH vs (12) AKR | 49 | 50 | 50 | 54 | **MICH** | MRVI AKR, MVIX MICH, top seed (1) 2.5x, close (<8) |
 | MIDWEST | (6) TENN vs (2) ISU | 50 | 52 | 49 | 53 | **ISU** | MRVI ISU, MVIX ISU, top seed (2) 2.5x, close (<8) |
+
 ---
-## Elite 8
+## Elite 8 *(no seed protection from here)*
 | Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
 |---|---|---|---|---|---|---|---|
-| EAST | (12) UNI vs (11) USF | 46 | 54 | 48 | 54 | **UNI** | MRVI UNI, MVIX UNI, close (<8) |
-| WEST | (4) ARK vs (3) GONZ | 50 | 53 | 50 | 53 | **GONZ** | MRVI GONZ, close (<8) |
-| SOUTH | (1) FLA vs (6) UNC | 49 | 50 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC, top seed (1) 2.5x |
-| MIDWEST | (1) MICH vs (2) ISU | 49 | 50 | 49 | 53 | **MICH** | MRVI ISU, MVIX MICH, top seed (1) 2.5x, close (<8) |
+| EAST | (12) UNI vs (11) USF | 46 | 54 | 48 | 54 | **UNI** | MRVI UNI, MVIX UNI |
+| WEST | (4) ARK vs (3) GONZ | 50 | 53 | 50 | 53 | **GONZ** | MRVI GONZ |
+| SOUTH | (1) FLA vs (6) UNC | 49 | 50 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC |
+| MIDWEST | (1) MICH vs (2) ISU | 49 | 50 | 49 | 53 | **ISU** | MRVI ISU, MVIX MICH |
 ### Regional Champions
 | Region | Champion | Seed | MVIX | MRVI |
 |---|---|---|---|---|
 | EAST | **UNI** | 12 | 46 | 54 |
 | WEST | **GONZ** | 3 | 50 | 53 |
 | SOUTH | **UNC** | 6 | 40 | 57 |
-| MIDWEST | **MICH** | 1 | 49 | 50 |
+| MIDWEST | **ISU** | 2 | 49 | 53 |
 
 ---
 ## Final Four
 | Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
 |---|---|---|---|---|---|---|---|
-| FF | (12) UNI vs (3) GONZ | 46 | 54 | 50 | 53 | **UNI** | MRVI UNI, MVIX UNI, close (<8) |
-| FF | (6) UNC vs (1) MICH | 40 | 57 | 49 | 50 | **UNC** | MRVI UNC, MVIX UNC, top seed (1) 2.5x |
+| FF | (12) UNI vs (3) GONZ | 46 | 54 | 50 | 53 | **UNI** | MRVI UNI, MVIX UNI |
+| FF | (6) UNC vs (2) ISU | 40 | 57 | 49 | 53 | **UNC** | MRVI UNC, MVIX UNC |
 ---
 ## Championship
 | Region | Matchup | MVIX | MRVI | MVIX | MRVI | Pick | Signal |
 |---|---|---|---|---|---|---|---|
-| CHAMP | (12) UNI vs (6) UNC | 46 | 54 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC, close (<8) |
+| CHAMP | (12) UNI vs (6) UNC | 46 | 54 | 40 | 57 | **UNC** | MRVI UNC, MVIX UNC |
 ### Predicted Final: (6) UNC 78, (12) UNI 75
 ---
-## Generated March 16, 2026 | 7,946 CBB records | 100% MRVI | Top seed: 2.5x
+## Generated March 16, 2026 | 7,946 CBB records | 100% MRVI | Seed protect: R1-R2-S16 (2.5x)
