@@ -184,6 +184,64 @@ Based on Dorsey's original research and our MVIX findings:
 - The strongest signal will be rolling low MVIX + rolling high MRVI (calm team with upward volatility trend)
 - MRVI will be most valuable as an in-game indicator for detecting regime changes before they manifest in the score
 
+## Empirical Results (40 Games, March 14-15, 2026)
+
+MRVI was computed for all 40 final games (14 NBA, 26 CBB) from March 14-15, 2026 and compared against MVIX as a predictor of game outcomes.
+
+### Overall Prediction Accuracy
+
+| Metric | All (40 games) | NBA (14) | CBB (26) |
+|---|---|---|---|
+| Lower MVIX wins | **60.0%** | 57% | **62%** |
+| Higher MRVI wins | 52.5% | 36% | **62%** |
+| Lower avgUpMagnitude wins | **61.3%** | — | — |
+| Combo (-mvix + mrvi) wins | 55.0% | 36% | **65%** |
+| When MVIX + MRVI agree | **64.7%** | — | — |
+
+### Winner vs Loser Average Profile
+
+| Metric | Winner avg | Loser avg | Diff |
+|---|---|---|---|
+| MVIX | 39.4 | 40.8 | -1.5 |
+| MRVI | 50.5 | 49.9 | +0.6 |
+
+### Key Findings
+
+1. **MVIX is the stronger standalone predictor** at 60% overall. MRVI alone is 52.5% — barely above coin flip.
+
+2. **MRVI performs well in CBB but poorly in NBA.** In college basketball, MRVI matched MVIX at 62%. In NBA it was 36% — actively inversely correlated. NBA games may have too many momentum reversals for the Wilder smoothing to track meaningfully within a single game.
+
+3. **The combo score (-mvix + mrvi) is the best CBB predictor at 65%.** A calm team (low MVIX) whose volatility trends upward (high MRVI) correctly picks CBB winners 2 out of 3 times.
+
+4. **When MVIX and MRVI agree, accuracy jumps to 64.7%.** They only agreed in 17 of 40 games, but the convergence signal was stronger than either alone.
+
+5. **Winner/loser MRVI profiles are nearly identical** (50.5 vs 49.9) — unlike MVIX where there's a clearer separation. MRVI does not separate winners from losers well on aggregate averages.
+
+### Notable Game Results
+
+| Game | Winner | W MVIX | W MRVI | L MVIX | L MRVI | MVIX | MRVI | Combo |
+|---|---|---|---|---|---|---|---|---|
+| CBB VAN vs ARK | ARK | 32 | 55.2 | 59 | 51.9 | ✓ | ✓ | ✓ |
+| CBB PENN vs YALE | PENN | 29 | 48.7 | 36 | 52.7 | ✓ | ✗ | ✓ |
+| CBB PUR vs UCLA | PUR | 60 | 46.1 | 100 | 37.7 | ✓ | ✓ | ✓ |
+| NBA CHA vs SA | SA | 23 | 54.5 | 37 | 48.3 | ✓ | ✓ | ✓ |
+| CBB HOU vs ARIZ | ARIZ | 100 | 33.1 | 85 | 55.3 | ✗ | ✗ | ✗ |
+
+**VAN vs ARK** (from our case study): Both MVIX and MRVI correctly predicted ARK. Arkansas played calmer (MVIX 32 vs 59) with a favorable volatility direction (MRVI 55.2).
+
+**PENN vs YALE** (tracked live): MVIX correctly predicted PENN, but MRVI pointed to YALE. The combo score still picked PENN correctly because the MVIX gap (29 vs 36) outweighed the MRVI gap.
+
+**HOU vs ARIZ**: Both predictors failed. Arizona won despite having higher MVIX (100 vs 85) and lower MRVI (33.1 vs 55.3) — a case where the underdog overcame an unfavorable volatility profile.
+
+### Recommendation
+
+MRVI adds value as a **CBB-specific confirming indicator** alongside MVIX, not as a standalone predictor. For NBA, MVIX alone is more reliable. Implementation should prioritize:
+
+1. **CBB combo score** (-mvix + mrvi) as the primary MRVI use case (65% accuracy)
+2. **Convergence signal** — when both MVIX and MRVI agree, flag as high-confidence prediction
+3. **NBA: deprioritize MRVI** — the 36% accuracy suggests the Dorsey smoothing parameters may need NBA-specific tuning, or the indicator is fundamentally less applicable to the faster, more talent-driven NBA game
+4. **Further research needed** — 40 games is a small sample; backfill across a full season to validate these league-specific patterns
+
 ## References
 
 - Dorsey, D. (1993). "The Relative Volatility Index." Technical Analysis of Stocks & Commodities.
