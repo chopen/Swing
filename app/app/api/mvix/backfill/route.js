@@ -27,11 +27,32 @@ function sleep(ms) {
 export async function GET(request) {
   try {
     const url = new URL(request.url);
-    const days = parseInt(url.searchParams.get('days') || '14', 10);
     const league = url.searchParams.get('league') || 'both';
+    const startParam = url.searchParams.get('start'); // YYYY-MM-DD
+    const endParam = url.searchParams.get('end');     // YYYY-MM-DD
+    const days = parseInt(url.searchParams.get('days') || '14', 10);
 
     const now = new Date();
     const eastern = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+
+    // Build list of dates to process
+    const datesToProcess = [];
+    if (startParam && endParam) {
+      // Date range mode: iterate from start to end
+      const cur = new Date(startParam + 'T12:00:00Z');
+      const endDate = new Date(endParam + 'T12:00:00Z');
+      while (cur <= endDate) {
+        datesToProcess.push(new Date(cur));
+        cur.setUTCDate(cur.getUTCDate() + 1);
+      }
+    } else {
+      // Days-back mode (original behavior)
+      for (let d = 0; d < days; d++) {
+        const date = new Date(eastern);
+        date.setDate(date.getDate() - d);
+        datesToProcess.push(date);
+      }
+    }
 
     const results = [];
     let processed = 0;
@@ -39,9 +60,7 @@ export async function GET(request) {
     let errors = 0;
     const errorDetails = [];
 
-    for (let d = 0; d < days; d++) {
-      const date = new Date(eastern);
-      date.setDate(date.getDate() - d);
+    for (const date of datesToProcess) {
       const dateStr =
         date.getFullYear().toString() +
         String(date.getMonth() + 1).padStart(2, '0') +
