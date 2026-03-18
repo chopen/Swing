@@ -37,6 +37,7 @@ export async function GET(request) {
     let processed = 0;
     let skipped = 0;
     let errors = 0;
+    const errorDetails = [];
 
     for (let d = 0; d < days; d++) {
       const date = new Date(eastern);
@@ -117,6 +118,9 @@ export async function GET(request) {
           await sleep(500);
         } catch (err) {
           errors++;
+          if (errorDetails.length < 5) {
+            errorDetails.push(`${game?.awayAbbr || '?'} vs ${game?.homeAbbr || '?'} (${game?.id || '?'}): ${err.message}`);
+          }
         }
       }
 
@@ -131,6 +135,7 @@ export async function GET(request) {
       gamesProcessed: processed,
       gamesSkipped: skipped,
       errors,
+      errorDetails,
       games: results,
     });
   } catch (err) {
