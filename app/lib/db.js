@@ -96,4 +96,32 @@ export async function initDb() {
   await sql`ALTER TABLE team_mvix ADD COLUMN IF NOT EXISTS conf_strength REAL`;
   await sql`ALTER TABLE team_mvix ADD COLUMN IF NOT EXISTS adj_mvix REAL`;
   await sql`ALTER TABLE team_mvix ADD COLUMN IF NOT EXISTS adj_mrvi REAL`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS alert_logs (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      game_id VARCHAR(100) NOT NULL,
+      alert_type VARCHAR(50) NOT NULL,
+      period INTEGER,
+      clock VARCHAR(10),
+      away_abbr VARCHAR(10),
+      home_abbr VARCHAR(10),
+      away_score INTEGER,
+      home_score INTEGER,
+      away_momentum INTEGER,
+      home_momentum INTEGER,
+      away_mvix INTEGER,
+      home_mvix INTEGER,
+      away_bias INTEGER,
+      home_bias INTEGER,
+      away_mrvi REAL,
+      home_mrvi REAL,
+      away_rolling3_mvix REAL,
+      home_rolling3_mvix REAL,
+      away_rolling3_mrvi REAL,
+      home_rolling3_mrvi REAL,
+      created_at TIMESTAMP DEFAULT now(),
+      UNIQUE(game_id, alert_type, period, clock)
+    )
+  `;
 }

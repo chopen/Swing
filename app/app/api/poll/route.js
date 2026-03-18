@@ -12,6 +12,7 @@ const { computeMomentumFromPlays } = require('../../../lib/momentum');
 const { detectAlerts } = require('../../../lib/alerts');
 import { computeGameVolatility } from '../../../lib/mvix';
 import { recordGameMvix, getRolling3Excluding } from '../../../lib/team-mvix';
+import { logAlert } from '../../../lib/alert-logs';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
 const CACHE_TTL = 10_000; // 10 seconds
@@ -114,6 +115,14 @@ async function buildPollData(dateStr) {
     g.bluffing = alerts.bluffing;
     g.comeback = alerts.comeback;
     g.swingWarning = alerts.swingWarning;
+
+    // Fire-and-forget: log active alerts
+    const activeAlerts = ['bluffing', 'comeback', 'swingWarning'].filter(t => g[t]);
+    if (activeAlerts.length > 0) {
+      Promise.all(activeAlerts.map(t => logAlert(g, t))).catch(err =>
+        console.error('Alert log error:', err.message)
+      );
+    }
 
     return g;
   });
