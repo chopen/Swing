@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAlertLogs } from '../../../../lib/alert-logs';
+import { getAlertLogs } from '../../../../../lib/alert-logs';
 
 export const dynamic = 'force-dynamic';
 
