@@ -69,8 +69,9 @@ export async function GET(request) {
       );
 
       for (const event of finalEvents) {
+        let game = null;
         try {
-          const game = parseScoreboardEvent(event, event.league);
+          game = parseScoreboardEvent(event, event.league);
           if (!game || game.period < 2) {
             skipped++;
             continue;
