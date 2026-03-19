@@ -565,35 +565,43 @@ export default function Dashboard() {
                   {/* Legend card */}
                   {!isFullscreen && <div className="bg-white rounded-xl border border-[#dce6f0] flex flex-col justify-center" style={{ padding: '12px' }}>
                     <div className="flex flex-col items-center" style={{ marginBottom: '12px' }}>
-                      <Image src="/swing-logo.jpg" alt="" width={96} height={96} className="rounded-full" style={{ background: '#fff', marginBottom: '8px' }} />
+                      <Image src="/swing-logo.jpg" alt="" width={82} height={82} className="rounded-full" style={{ background: '#fff', marginBottom: '8px' }} />
                       <div className="text-xl font-bold text-[#1493ff]">
                         THE SWING &middot; How to Read
                       </div>
                     </div>
                     <div className="flex flex-col" style={{ gap: '8px' }}>
-                      <div className="flex items-center" style={{ gap: '10px' }}>
-                        <span className="w-3 h-3 rounded-full bg-[#6b7c93] shrink-0" />
-                        <span className="text-sm">
-                          <strong style={{ color: '#6b7c93' }}>Momentum 0&ndash;100</strong> <span className="text-[#001c55]">&mdash; process, not outcome</span>
-                        </span>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm text-[#8494a7] shrink-0">📈</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">Chart</strong> &mdash; each team&rsquo;s momentum (0&ndash;100). Tap to inspect.</span>
                       </div>
-                      <div className="flex items-center" style={{ gap: '10px' }}>
-                        <span className="w-3 h-3 rounded-full bg-[#C0392B] shrink-0" />
-                        <span className="text-sm">
-                          <strong style={{ color: '#C0392B' }}>Bluffing</strong> <span className="text-[#001c55]">&mdash; score &amp; momentum leaders disagree</span>
-                        </span>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#C0392B] shrink-0 mt-1" />
+                        <span className="text-sm"><strong style={{ color: '#C0392B' }}>Bluffing</strong> &mdash; score &amp; momentum disagree</span>
                       </div>
-                      <div className="flex items-center" style={{ gap: '10px' }}>
-                        <span className="w-3 h-3 rounded-full bg-[#00C853] shrink-0" />
-                        <span className="text-sm">
-                          <strong style={{ color: '#00C853' }}>Comeback Watch</strong> <span className="text-[#001c55]">&mdash; trailing team leads momentum</span>
-                        </span>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#00C853] shrink-0 mt-1" />
+                        <span className="text-sm"><strong style={{ color: '#00C853' }}>Comeback</strong> &mdash; trailing team leads momentum</span>
                       </div>
-                      <div className="flex items-center" style={{ gap: '10px' }}>
-                        <span className="w-3 h-3 rounded-full bg-[#FFD700] shrink-0" />
-                        <span className="text-sm">
-                          <strong style={{ color: '#FFD700' }}>Swing Warning</strong> <span className="text-[#001c55]">&mdash; close score, one-sided momentum</span>
-                        </span>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#FFD700] shrink-0 mt-1" />
+                        <span className="text-sm"><strong style={{ color: '#FFD700' }}>Swing Warning</strong> &mdash; close score, lopsided momentum</span>
+                      </div>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm shrink-0">🌊</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">MVIX</strong> &mdash; volatility (lower = calmer). Arrow = bias direction.</span>
+                      </div>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm shrink-0">🧭</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">MRVI</strong> &mdash; momentum direction. <strong style={{ color: '#00C853' }}>&gt;50 up</strong>, <strong style={{ color: '#C0392B' }}>&lt;50 down</strong>.</span>
+                      </div>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm text-[#8494a7] shrink-0">▸</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">Play Feed</strong> &mdash; live play-by-play log</span>
+                      </div>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm text-[#8494a7] shrink-0">▸</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">Swing History</strong> &mdash; every alert with full game state</span>
                       </div>
                     </div>
                   </div>}
