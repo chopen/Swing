@@ -72,25 +72,21 @@ export default function AlertHistory({ gameId, awayAbbr, homeAbbr, awayColor, ho
                   <span className="text-[#555]">{a.away_score} – {a.home_score}</span>
                   <span style={{ color: homeColor }}>{homeAbbr}</span>
                 </div>
-                <div className="flex gap-4 text-xs">
-                  <div>
-                    <span className="font-semibold" style={{ color: awayColor }}>{awayAbbr}</span>
-                    <span className="text-[#6b7c93] ml-3">
-                      Mom {a.away_momentum} · MVIX {a.away_mvix ?? '–'}
-                      {a.away_bias != null && <> · Bias {a.away_bias > 0 ? '+' : ''}{a.away_bias}</>}
-                      {a.away_mrvi != null && <> · MRVI {Math.round(a.away_mrvi)}</>}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-semibold min-w-[36px]" style={{ color: awayColor }}>{awayAbbr}</span>
+                  <span className="text-[#6b7c93]">
+                    Mom {a.away_momentum} · MVIX {a.away_mvix ?? '–'}
+                    {a.away_bias != null && <> · Bias {a.away_bias > 0 ? '+' : ''}{a.away_bias}</>}
+                    {a.away_mrvi != null && <> · MRVI {Math.round(a.away_mrvi)}</>}
+                  </span>
                 </div>
-                <div className="flex gap-4 text-xs mt-0.5">
-                  <div>
-                    <span className="font-semibold" style={{ color: homeColor }}>{homeAbbr}</span>
-                    <span className="text-[#6b7c93] ml-3">
-                      Mom {a.home_momentum} · MVIX {a.home_mvix ?? '–'}
-                      {a.home_bias != null && <> · Bias {a.home_bias > 0 ? '+' : ''}{a.home_bias}</>}
-                      {a.home_mrvi != null && <> · MRVI {Math.round(a.home_mrvi)}</>}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2 text-xs mt-0.5">
+                  <span className="font-semibold min-w-[36px]" style={{ color: homeColor }}>{homeAbbr}</span>
+                  <span className="text-[#6b7c93]">
+                    Mom {a.home_momentum} · MVIX {a.home_mvix ?? '–'}
+                    {a.home_bias != null && <> · Bias {a.home_bias > 0 ? '+' : ''}{a.home_bias}</>}
+                    {a.home_mrvi != null && <> · MRVI {Math.round(a.home_mrvi)}</>}
+                  </span>
                 </div>
               </div>
             );
