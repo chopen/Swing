@@ -507,37 +507,44 @@ export default function Sparkline({ chartAway, chartHome, awayColor, homeColor, 
       )}
 
       {/* MRVI Meter */}
-      {mvixAway && mvixHome && mvixAway.mrvi != null && mvixHome.mrvi != null && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', padding: '0 2px' }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: awayColor, minWidth: '30px', textAlign: 'right', lineHeight: 1 }}>{awayAbbr}</span>
-            <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative' }}>
-              <div style={{
-                width: `${Math.min(100, Math.max(0, mvixAway.mrvi))}%`,
-                height: '100%',
-                borderRadius: '3px',
-                background: mvixAway.mrvi > 55 ? '#00C853' : mvixAway.mrvi < 45 ? '#C0392B' : '#FFD700',
-                transition: 'width 1s ease-out',
-              }} />
+      {chartAway && chartHome && chartAway.length > 0 && (() => {
+        const awayMrvi = mvixAway?.mrvi;
+        const homeMrvi = mvixHome?.mrvi;
+        const computing = !mvixAway || !mvixHome || awayMrvi == null || homeMrvi == null;
+        const awayVal = awayMrvi ?? 0;
+        const homeVal = homeMrvi ?? 0;
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', padding: '0 2px' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: awayColor, minWidth: '30px', textAlign: 'right', lineHeight: 1 }}>{awayAbbr}</span>
+              <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative' }}>
+                <div style={{
+                  width: `${Math.min(100, Math.max(0, awayVal))}%`,
+                  height: '100%',
+                  borderRadius: '3px',
+                  background: computing ? '#ccc' : awayVal > 55 ? '#00C853' : awayVal < 45 ? '#C0392B' : '#FFD700',
+                  transition: 'width 1s ease-out',
+                }} />
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', textAlign: 'right', lineHeight: 1 }}>{computing ? '–' : Math.round(awayVal)}</span>
             </div>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', textAlign: 'right', lineHeight: 1 }}>{Math.round(mvixAway.mrvi)}</span>
-          </div>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#8494a7', whiteSpace: 'nowrap', lineHeight: 1 }}>Live MRVI</span>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', lineHeight: 1 }}>{Math.round(mvixHome.mrvi)}</span>
-            <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative', direction: 'rtl' }}>
-              <div style={{
-                width: `${Math.min(100, Math.max(0, mvixHome.mrvi))}%`,
-                height: '100%',
-                borderRadius: '3px',
-                background: mvixHome.mrvi > 55 ? '#00C853' : mvixHome.mrvi < 45 ? '#C0392B' : '#FFD700',
-                transition: 'width 1s ease-out',
-              }} />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#8494a7', whiteSpace: 'nowrap', lineHeight: 1 }}>{computing ? 'Computing' : 'Live MRVI'}</span>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7c93', minWidth: '18px', lineHeight: 1 }}>{computing ? '–' : Math.round(homeVal)}</span>
+              <div style={{ flex: 1, height: '6px', background: '#ebebeb', borderRadius: '3px', overflow: 'hidden', position: 'relative', direction: 'rtl' }}>
+                <div style={{
+                  width: `${Math.min(100, Math.max(0, homeVal))}%`,
+                  height: '100%',
+                  borderRadius: '3px',
+                  background: computing ? '#ccc' : homeVal > 55 ? '#00C853' : homeVal < 45 ? '#C0392B' : '#FFD700',
+                  transition: 'width 1s ease-out',
+                }} />
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: homeColor, minWidth: '30px', lineHeight: 1 }}>{homeAbbr}</span>
             </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: homeColor, minWidth: '30px', lineHeight: 1 }}>{homeAbbr}</span>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
