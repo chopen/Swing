@@ -16,11 +16,11 @@ export default function AlertHistory({ alertLogs, awayAbbr, homeAbbr, awayColor,
   return (
     <>
       <div
-        className="flex items-center justify-between py-3 border-t border-[#f0f0f0] cursor-pointer select-none transition-colors"
-        onClick={() => setOpen(!open)}
+        className={`flex items-center justify-between py-3 border-t border-[#f0f0f0] select-none transition-colors ${alerts.length > 0 ? 'cursor-pointer' : 'opacity-50'}`}
+        onClick={() => alerts.length > 0 && setOpen(!open)}
       >
         <span className="text-sm font-semibold text-[#6b7c93]">
-          {open ? '\u25BE' : '\u25B8'} Swing History{alerts.length > 0 && <span className="ml-2 text-[#8494a7]">({alerts.length})</span>}
+          {open ? '\u25BE' : '\u25B8'} Swing History{' '}<span className="text-[#8494a7]">({alerts.length})</span>
         </span>
         <span
           className="text-sm text-[#8494a7] inline-block transition-transform duration-200"
