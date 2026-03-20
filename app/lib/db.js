@@ -98,6 +98,28 @@ export async function initDb() {
   await sql`ALTER TABLE team_mvix ADD COLUMN IF NOT EXISTS adj_mrvi REAL`;
 
   await sql`
+    CREATE TABLE IF NOT EXISTS player_swing_impact (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      game_id VARCHAR(100) NOT NULL,
+      game_date DATE NOT NULL,
+      league VARCHAR(10) NOT NULL,
+      team VARCHAR(10) NOT NULL,
+      athlete_id VARCHAR(20),
+      player_name VARCHAR(100) NOT NULL,
+      total_impact REAL NOT NULL,
+      swing_appearances INTEGER NOT NULL,
+      positive_plays INTEGER NOT NULL,
+      negative_plays INTEGER NOT NULL,
+      efficiency REAL NOT NULL,
+      total_swings INTEGER NOT NULL,
+      up_swings INTEGER NOT NULL,
+      down_swings INTEGER NOT NULL,
+      created_at TIMESTAMP DEFAULT now(),
+      UNIQUE(game_id, team, player_name)
+    )
+  `;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS alert_logs (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
       game_id VARCHAR(100) NOT NULL,

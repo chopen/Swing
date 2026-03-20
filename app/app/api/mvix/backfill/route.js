@@ -17,6 +17,8 @@ const {
 const { computeMomentumFromPlays } = require('../../../../lib/momentum');
 import { computeGameVolatility } from '../../../../lib/mvix';
 import { recordGameMvix } from '../../../../lib/team-mvix';
+import { recordPlayerSwingImpact, hasSwingImpact } from '../../../../lib/player-swing';
+const { computeGameSwingImpact } = require('../../../../lib/swing-impact');
 
 export const dynamic = 'force-dynamic';
 
@@ -130,6 +132,32 @@ export async function GET(request) {
             recordGameMvix(game.awayAbbr, game.league, game.id, gameDate, awayWon, `${game.awayScore}-${game.homeScore}`, vol.away),
             recordGameMvix(game.homeAbbr, game.league, game.id, gameDate, !awayWon, `${game.homeScore}-${game.awayScore}`, vol.home),
           ]);
+
+          // Compute and store player swing impact
+          if (!(await hasSwingImpact(game.id))) {
+            try {
+              const swingResult = computeGameSwingImpact(plays, summary, game);
+              if (swingResult) {
+                const awayInfl = {
+                  total: swingResult.away.inflections.length,
+                  up: swingResult.away.inflections.filter((i) => i.upward).length,
+                  down: swingResult.away.inflections.filter((i) => !i.upward).length,
+                };
+                const homeInfl = {
+                  total: swingResult.home.inflections.length,
+                  up: swingResult.home.inflections.filter((i) => i.upward).length,
+                  down: swingResult.home.inflections.filter((i) => !i.upward).length,
+                };
+                await Promise.all([
+                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.awayAbbr, swingResult.away.leaderboard, awayInfl),
+                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.homeAbbr, swingResult.home.leaderboard, homeInfl),
+                ]);
+              }
+            } catch (swingErr) {
+              // Non-fatal: log but don't fail the game
+              console.warn(`Swing impact failed for ${game.id}: ${swingErr.message}`);
+            }
+          }
 
           processed++;
           results.push(`${dateISO} ${game.awayAbbr} vs ${game.homeAbbr} (${game.league})`);
