@@ -74,8 +74,8 @@ export async function GET(request, { params }) {
       homeInflections = homeInflections.filter((i) => !i.upward);
     }
 
-    const awayImpact = computeSwingImpact(awayInflections, batchPlays, game.awayAbbr);
-    const homeImpact = computeSwingImpact(homeInflections, batchPlays, game.homeAbbr);
+    const awayImpact = computeSwingImpact(awayInflections, batchPlays, game.awayAbbr, game.league);
+    const homeImpact = computeSwingImpact(homeInflections, batchPlays, game.homeAbbr, game.league);
 
     return Response.json({
       gameId,

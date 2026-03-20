@@ -10,6 +10,7 @@ const {
 
 const { computeMomentumFromPlays } = require('../../../lib/momentum');
 const { detectAlerts } = require('../../../lib/alerts');
+const { computeGameSwingImpact } = require('../../../lib/swing-impact');
 import { computeGameVolatility } from '../../../lib/mvix';
 import { recordGameMvix, getRolling3Excluding } from '../../../lib/team-mvix';
 import { logAlert, getAlertLogs } from '../../../lib/alert-logs';
@@ -21,6 +22,7 @@ let cachedResponse = null;
 let cacheTimestamp = 0;
 let fetchInFlight = null;
 const finalMomCache = new Map(); // gameId -> momentum data (never changes once final)
+const swingImpactCache = new Map(); // gameId -> swing impact data (cached for final + live)
 const rolling3Cache = new Map(); // gameId -> { away, home } rolling 3-game MVIX
 
 // Separate cache for historical date requests
@@ -63,12 +65,15 @@ async function buildPollData(dateStr) {
       (g.status === 'STATUS_FINAL' && g.period >= 2);
 
     if (needDetail) {
+      let summary = null;
+      let plays = null;
+
       // Use cached momentum for final games
       if (g.status === 'STATUS_FINAL' && finalMomCache.has(g.id)) {
         g.mom = finalMomCache.get(g.id);
       } else {
-        const summary = await fetchGameSummary(g.id, g.league);
-        const plays = getPlaysFromSummary(summary);
+        summary = await fetchGameSummary(g.id, g.league);
+        plays = getPlaysFromSummary(summary);
         if (plays.length > 0) {
           g.mom = computeMomentumFromPlays(
             plays,
@@ -78,11 +83,30 @@ async function buildPollData(dateStr) {
             g.homeId,
             g.league
           );
-          // Cache momentum permanently once game is final
           if (g.status === 'STATUS_FINAL') {
             finalMomCache.set(g.id, g.mom);
           }
         }
+      }
+
+      // Compute swing impact (use cache if available, otherwise compute)
+      if (swingImpactCache.has(g.id)) {
+        g.swingers = swingImpactCache.get(g.id);
+      } else if (g.mom) {
+        try {
+          if (!summary) summary = await fetchGameSummary(g.id, g.league);
+          if (!plays) plays = getPlaysFromSummary(summary);
+          const si = computeGameSwingImpact(plays, summary, g);
+          if (si) {
+            g.swingers = {
+              away: si.away.leaderboard.slice(0, 3),
+              home: si.home.leaderboard.slice(0, 3),
+            };
+            if (g.status === 'STATUS_FINAL') {
+              swingImpactCache.set(g.id, g.swingers);
+            }
+          }
+        } catch {}
       }
     }
 

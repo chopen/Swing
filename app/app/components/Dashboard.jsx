@@ -601,6 +601,10 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-start" style={{ gap: '8px' }}>
                         <span className="text-sm text-[#8494a7] shrink-0">▸</span>
+                        <span className="text-sm"><strong className="text-[#6b7c93]">Swingers</strong> &mdash; top players driving momentum shifts, weighted by magnitude. <strong style={{ color: '#C0392B' }}>CLUTCH</strong> = late-game impact.</span>
+                      </div>
+                      <div className="flex items-start" style={{ gap: '8px' }}>
+                        <span className="text-sm text-[#8494a7] shrink-0">▸</span>
                         <span className="text-sm"><strong className="text-[#6b7c93]">Swing History</strong> &mdash; every alert with full game state</span>
                       </div>
                     </div>

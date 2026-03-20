@@ -2,6 +2,7 @@
 
 import Sparkline from './Sparkline';
 import PlayFeed from './PlayFeed';
+import SwingersPanel from './SwingersPanel';
 import AlertHistory from './AlertHistory';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
@@ -294,6 +295,14 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
 
           <PlayFeed
             plays={g.mom.recentPlays}
+            awayAbbr={g.awayAbbr}
+            homeAbbr={g.homeAbbr}
+            awayColor={awayColorAdj}
+            homeColor={homeColorAdj}
+          />
+
+          <SwingersPanel
+            swingers={g.swingers}
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
             awayColor={awayColorAdj}

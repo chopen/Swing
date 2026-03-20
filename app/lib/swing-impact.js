@@ -66,13 +66,19 @@ function buildRoster(summary) {
     for (const stat of team.statistics || []) {
       for (const athlete of stat.athletes || []) {
         const a = athlete.athlete;
-        if (a?.id) roster[a.id] = a.displayName || a.shortName || 'Unknown';
+        if (a?.id) roster[a.id] = { name: a.displayName || a.shortName || 'Unknown', jersey: a.jersey || null };
       }
     }
   }
   for (const team of summary.rosters || []) {
     for (const entry of team.roster || []) {
-      if (entry.id) roster[entry.id] = entry.displayName || entry.shortName || roster[entry.id] || 'Unknown';
+      if (entry.id) {
+        const existing = roster[entry.id];
+        roster[entry.id] = {
+          name: entry.displayName || entry.shortName || existing?.name || 'Unknown',
+          jersey: entry.jersey || existing?.jersey || null,
+        };
+      }
     }
   }
   return roster;
@@ -113,8 +119,10 @@ function replayMomentumWithPlayers(plays, awayAbbr, homeAbbr, awayId, homeId, le
 
     const athleteId = play.participants?.[0]?.athlete?.id;
     let playerName = null;
+    let jersey = null;
     if (athleteId && roster[athleteId]) {
-      playerName = roster[athleteId];
+      playerName = roster[athleteId].name;
+      jersey = roster[athleteId].jersey;
     } else if (play.text) {
       const match = play.text.match(/^([A-Z][a-z''-]+ [A-Z][a-z''-]+)/);
       if (match) playerName = match[1];
@@ -123,12 +131,15 @@ function replayMomentumWithPlayers(plays, awayAbbr, homeAbbr, awayId, homeId, le
     currentBatch.push({
       player: playerName,
       athleteId: athleteId || null,
+      jersey,
       team,
       possessionScore: ps,
       text: play.text || '',
       type: play.type?.text || '',
       period: play.period?.number,
       clock: play.clock?.displayValue,
+      awayScore: play.awayScore,
+      homeScore: play.homeScore,
     });
 
     if (i % 5 === 0) {
@@ -148,7 +159,23 @@ function replayMomentumWithPlayers(plays, awayAbbr, homeAbbr, awayId, homeId, le
   return { chartAway, chartHome, batchPlays };
 }
 
-function computeSwingImpact(inflections, batchPlays, teamAbbr) {
+/**
+ * Check if a play occurred in the clutch window:
+ * final 5 minutes of regulation AND score within 12 points.
+ */
+function isClutchPlay(play, league) {
+  if (!play.period || !play.clock) return false;
+  const regPeriods = league === 'NBA' ? 4 : 2;
+  if (play.period !== regPeriods) return false;
+  const [m] = play.clock.split(':').map(Number);
+  if ((m || 0) >= 5) return false;
+  if (play.awayScore != null && play.homeScore != null) {
+    if (Math.abs(play.awayScore - play.homeScore) > 12) return false;
+  }
+  return true;
+}
+
+function computeSwingImpact(inflections, batchPlays, teamAbbr, league) {
   const playerMap = {};
   const swings = [];
 
@@ -162,6 +189,7 @@ function computeSwingImpact(inflections, batchPlays, teamAbbr) {
     }
 
     const teamPlays = windowPlays.filter((p) => p.team === teamAbbr && p.possessionScore !== 0);
+    const mag = swing.magnitude || 1;
 
     swings.push({
       direction: swing.upward ? 'up' : 'down',
@@ -182,17 +210,26 @@ function computeSwingImpact(inflections, batchPlays, teamAbbr) {
       if (!playerMap[p.player]) {
         playerMap[p.player] = {
           athleteId: p.athleteId,
+          jersey: p.jersey,
           totalImpact: 0,
+          weightedImpact: 0,
           swingAppearances: 0,
           positivePlays: 0,
           negativePlays: 0,
+          clutchAppearances: 0,
+          clutchPositive: 0,
         };
       }
       const entry = playerMap[p.player];
       entry.totalImpact += p.possessionScore;
+      entry.weightedImpact += p.possessionScore * mag;
       entry.swingAppearances++;
       if (p.possessionScore > 0) entry.positivePlays++;
       else entry.negativePlays++;
+      if (isClutchPlay(p, league)) {
+        entry.clutchAppearances++;
+        if (p.possessionScore > 0) entry.clutchPositive++;
+      }
     }
   }
 
@@ -200,15 +237,19 @@ function computeSwingImpact(inflections, batchPlays, teamAbbr) {
     .map(([name, data]) => ({
       player: name,
       athleteId: data.athleteId,
+      jersey: data.jersey,
       totalImpact: Math.round(data.totalImpact * 10) / 10,
+      weightedImpact: Math.round(data.weightedImpact * 10) / 10,
       swingAppearances: data.swingAppearances,
       positivePlays: data.positivePlays,
       negativePlays: data.negativePlays,
       efficiency: data.swingAppearances > 0
         ? Math.round((data.positivePlays / data.swingAppearances) * 1000) / 10
         : 0,
+      clutchAppearances: data.clutchAppearances,
+      clutchPositive: data.clutchPositive,
     }))
-    .sort((a, b) => b.totalImpact - a.totalImpact);
+    .sort((a, b) => b.weightedImpact - a.weightedImpact);
 
   return { swings, leaderboard };
 }
@@ -228,8 +269,8 @@ function computeGameSwingImpact(plays, summary, game) {
   const awayInflections = findInflections(chartAway, game.league);
   const homeInflections = findInflections(chartHome, game.league);
 
-  const awayResult = computeSwingImpact(awayInflections, batchPlays, game.awayAbbr);
-  const homeResult = computeSwingImpact(homeInflections, batchPlays, game.homeAbbr);
+  const awayResult = computeSwingImpact(awayInflections, batchPlays, game.awayAbbr, game.league);
+  const homeResult = computeSwingImpact(homeInflections, batchPlays, game.homeAbbr, game.league);
 
   return {
     away: {
