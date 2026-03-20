@@ -125,7 +125,16 @@ function replayMomentumWithPlayers(plays, awayAbbr, homeAbbr, awayId, homeId, le
       jersey = roster[athleteId].jersey;
     } else if (play.text) {
       const match = play.text.match(/^([A-Z][a-z''-]+ [A-Z][a-z''-]+)/);
-      if (match) playerName = match[1];
+      if (match) {
+        // Verify the matched name is a real player in the roster, not a team-level play
+        // like "Iowa Offensive Rebound" or "Clemson Deadball Team Rebound"
+        const candidate = match[1];
+        const rosterEntry = Object.values(roster).find((r) => r.name === candidate);
+        if (rosterEntry) {
+          playerName = rosterEntry.name;
+          jersey = rosterEntry.jersey;
+        }
+      }
     }
 
     currentBatch.push({
