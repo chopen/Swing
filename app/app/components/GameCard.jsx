@@ -1,6 +1,7 @@
 'use client';
 
 import Sparkline from './Sparkline';
+import PregameMatchup from './PregameMatchup';
 import PlayFeed from './PlayFeed';
 import SwingersPanel from './SwingersPanel';
 import AlertHistory from './AlertHistory';
@@ -164,16 +165,6 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
               {g.awayAbbr}
             </div>
             <div className="text-sm text-[#8494a7] mt-0.5">{g.awayName?.split(' ').pop()}</div>
-            {g.rolling3Away && (
-              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
-                Last {g.rolling3Away.games}gm MVIX: <span style={{ fontWeight: 700, color: g.rolling3Away.mvix < 40 ? '#00C853' : g.rolling3Away.mvix > 65 ? '#C0392B' : '#FFD700' }}>{g.rolling3Away.mvix}</span>
-              </div>
-            )}
-            {g.rolling3Away?.mrvi != null && (
-              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '1px' }}>
-                Last {g.rolling3Away.games}gm MRVI: <span style={{ fontWeight: 700, color: g.rolling3Away.mrvi > 55 ? '#00C853' : g.rolling3Away.mrvi < 45 ? '#C0392B' : '#FFD700' }}>{g.rolling3Away.mrvi}</span>
-              </div>
-            )}
           </div>
 
           {/* Center score */}
@@ -212,16 +203,6 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
               {g.homeAbbr}
             </div>
             <div className="text-sm text-[#8494a7] mt-0.5">{g.homeName?.split(' ').pop()}</div>
-            {g.rolling3Home && (
-              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '2px' }}>
-                Last {g.rolling3Home.games}gm MVIX: <span style={{ fontWeight: 700, color: g.rolling3Home.mvix < 40 ? '#00C853' : g.rolling3Home.mvix > 65 ? '#C0392B' : '#FFD700' }}>{g.rolling3Home.mvix}</span>
-              </div>
-            )}
-            {g.rolling3Home?.mrvi != null && (
-              <div style={{ fontSize: '10px', color: '#8494a7', marginTop: '1px' }}>
-                Last {g.rolling3Home.games}gm MRVI: <span style={{ fontWeight: 700, color: g.rolling3Home.mrvi > 55 ? '#00C853' : g.rolling3Home.mrvi < 45 ? '#C0392B' : '#FFD700' }}>{g.rolling3Home.mrvi}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -291,6 +272,15 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             league={g.league}
             mvixAway={g.mvixAway}
             mvixHome={g.mvixHome}
+          />
+
+          <PregameMatchup
+            rolling3Away={g.rolling3Away}
+            rolling3Home={g.rolling3Home}
+            awayAbbr={g.awayAbbr}
+            homeAbbr={g.homeAbbr}
+            awayColor={awayColorAdj}
+            homeColor={homeColorAdj}
           />
 
           <PlayFeed
