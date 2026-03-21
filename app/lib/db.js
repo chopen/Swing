@@ -119,6 +119,12 @@ export async function initDb() {
     )
   `;
 
+  await sql`ALTER TABLE player_swing_impact ADD COLUMN IF NOT EXISTS conference_id VARCHAR(10)`;
+  await sql`ALTER TABLE player_swing_impact ADD COLUMN IF NOT EXISTS conference VARCHAR(60)`;
+  await sql`ALTER TABLE player_swing_impact ADD COLUMN IF NOT EXISTS weighted_impact REAL`;
+  await sql`ALTER TABLE player_swing_impact ADD COLUMN IF NOT EXISTS clutch_appearances INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE player_swing_impact ADD COLUMN IF NOT EXISTS jersey VARCHAR(5)`;
+
   await sql`
     CREATE TABLE IF NOT EXISTS alert_logs (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

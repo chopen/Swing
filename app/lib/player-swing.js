@@ -5,18 +5,21 @@ import { sql } from './db.js';
 /**
  * Record swing impact for all players in a team's game.
  */
-export async function recordPlayerSwingImpact(gameId, gameDate, league, team, leaderboard, inflectionCounts) {
+export async function recordPlayerSwingImpact(gameId, gameDate, league, team, leaderboard, inflectionCounts, conferenceId, conferenceName) {
   for (const player of leaderboard) {
     await sql`
       INSERT INTO player_swing_impact (
         game_id, game_date, league, team, athlete_id, player_name,
         total_impact, swing_appearances, positive_plays, negative_plays, efficiency,
-        total_swings, up_swings, down_swings
+        total_swings, up_swings, down_swings,
+        conference_id, conference, weighted_impact, clutch_appearances, jersey
       ) VALUES (
         ${gameId}, ${gameDate}, ${league}, ${team}, ${player.athleteId},
         ${player.player}, ${player.totalImpact}, ${player.swingAppearances},
         ${player.positivePlays}, ${player.negativePlays}, ${player.efficiency},
-        ${inflectionCounts.total}, ${inflectionCounts.up}, ${inflectionCounts.down}
+        ${inflectionCounts.total}, ${inflectionCounts.up}, ${inflectionCounts.down},
+        ${conferenceId || null}, ${conferenceName || null},
+        ${player.weightedImpact || 0}, ${player.clutchAppearances || 0}, ${player.jersey || null}
       )
       ON CONFLICT (game_id, team, player_name) DO UPDATE SET
         athlete_id = COALESCE(EXCLUDED.athlete_id, player_swing_impact.athlete_id),
@@ -27,7 +30,12 @@ export async function recordPlayerSwingImpact(gameId, gameDate, league, team, le
         efficiency = EXCLUDED.efficiency,
         total_swings = EXCLUDED.total_swings,
         up_swings = EXCLUDED.up_swings,
-        down_swings = EXCLUDED.down_swings
+        down_swings = EXCLUDED.down_swings,
+        conference_id = COALESCE(EXCLUDED.conference_id, player_swing_impact.conference_id),
+        conference = COALESCE(EXCLUDED.conference, player_swing_impact.conference),
+        weighted_impact = EXCLUDED.weighted_impact,
+        clutch_appearances = EXCLUDED.clutch_appearances,
+        jersey = COALESCE(EXCLUDED.jersey, player_swing_impact.jersey)
     `;
   }
 }
@@ -86,6 +94,55 @@ export async function getPlayerHistory(playerName, league, limit = 20) {
 /**
  * Get top swing impact players across all teams in a league.
  */
+/**
+ * Get top swingers per conference for a given week (Mon–Sun).
+ */
+export async function getWeeklySwingersbyConference(weekStart, weekEnd, conferenceName = null) {
+  if (conferenceName) {
+    const { rows } = await sql`
+      SELECT player_name AS "player",
+             athlete_id AS "athleteId",
+             jersey,
+             team,
+             conference,
+             COUNT(*) AS "gamesPlayed",
+             ROUND(AVG(COALESCE(weighted_impact, total_impact))::numeric, 1) AS "avgWeightedImpact",
+             ROUND(SUM(COALESCE(weighted_impact, total_impact))::numeric, 1) AS "totalWeightedImpact",
+             ROUND(AVG(efficiency)::numeric, 1) AS "avgEfficiency",
+             SUM(CASE WHEN COALESCE(clutch_appearances, 0) > 0 THEN 1 ELSE 0 END)::integer AS "clutchGames"
+      FROM player_swing_impact
+      WHERE league = 'CBB'
+        AND game_date >= ${weekStart}
+        AND game_date <= ${weekEnd}
+        AND conference = ${conferenceName}
+      GROUP BY player_name, athlete_id, jersey, team, conference
+      ORDER BY AVG(COALESCE(weighted_impact, total_impact)) DESC
+    `;
+    return rows;
+  }
+
+  const { rows } = await sql`
+    SELECT player_name AS "player",
+           athlete_id AS "athleteId",
+           jersey,
+           team,
+           conference,
+           COUNT(*) AS "gamesPlayed",
+           ROUND(AVG(COALESCE(weighted_impact, total_impact))::numeric, 1) AS "avgWeightedImpact",
+           ROUND(SUM(COALESCE(weighted_impact, total_impact))::numeric, 1) AS "totalWeightedImpact",
+           ROUND(AVG(efficiency)::numeric, 1) AS "avgEfficiency",
+           SUM(CASE WHEN COALESCE(clutch_appearances, 0) > 0 THEN 1 ELSE 0 END)::integer AS "clutchGames"
+    FROM player_swing_impact
+    WHERE league = 'CBB'
+      AND game_date >= ${weekStart}
+      AND game_date <= ${weekEnd}
+      AND conference IS NOT NULL
+    GROUP BY player_name, athlete_id, jersey, team, conference
+    ORDER BY AVG(COALESCE(weighted_impact, total_impact)) DESC
+  `;
+  return rows;
+}
+
 export async function getLeagueLeaderboard(league, minGames = 5, limit = 25) {
   const { rows } = await sql`
     SELECT player_name AS "player",

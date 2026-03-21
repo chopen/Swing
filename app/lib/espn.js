@@ -170,6 +170,8 @@ function parseScoreboardEvent(event, league) {
     homeColor: '#' + (homeTeam.color || '555555'),
     awayScore: parseInt(away.score || 0, 10),
     homeScore: parseInt(home.score || 0, 10),
+    awayConferenceId: awayTeam.conferenceId || null,
+    homeConferenceId: homeTeam.conferenceId || null,
     network,
     venue,
     mom: null,

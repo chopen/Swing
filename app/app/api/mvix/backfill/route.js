@@ -19,6 +19,7 @@ import { computeGameVolatility } from '../../../../lib/mvix';
 import { recordGameMvix } from '../../../../lib/team-mvix';
 import { recordPlayerSwingImpact, hasSwingImpact } from '../../../../lib/player-swing';
 const { computeGameSwingImpact } = require('../../../../lib/swing-impact');
+const { getConferenceName } = require('../../../../lib/conferences');
 
 export const dynamic = 'force-dynamic';
 
@@ -148,9 +149,13 @@ export async function GET(request) {
                   up: swingResult.home.inflections.filter((i) => i.upward).length,
                   down: swingResult.home.inflections.filter((i) => !i.upward).length,
                 };
+                const [awayConf, homeConf] = await Promise.all([
+                  getConferenceName(game.awayId),
+                  getConferenceName(game.homeId),
+                ]);
                 await Promise.all([
-                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.awayAbbr, swingResult.away.leaderboard, awayInfl),
-                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.homeAbbr, swingResult.home.leaderboard, homeInfl),
+                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.awayAbbr, swingResult.away.leaderboard, awayInfl, game.awayConferenceId, awayConf),
+                  recordPlayerSwingImpact(game.id, gameDate, game.league, game.homeAbbr, swingResult.home.leaderboard, homeInfl, game.homeConferenceId, homeConf),
                 ]);
               }
             } catch (swingErr) {
