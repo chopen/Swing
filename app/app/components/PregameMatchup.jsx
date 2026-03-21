@@ -38,11 +38,11 @@ function SubsectionHeader({ title }) {
 }
 
 const TIERS = [
-  { min: 305, label: 'Elite', color: '#C0392B' },
-  { min: 255, label: 'Excellent', color: '#E67E22' },
-  { min: 215, label: 'Above Avg', color: '#1493ff' },
-  { min: 175, label: 'Average', color: '#6b7c93' },
-  { min: 0,   label: 'Below Avg', color: '#8494a7' },
+  { min: 305, label: 'Elite', color: '#00C853' },
+  { min: 255, label: 'Excellent', color: '#66BB6A' },
+  { min: 215, label: 'Above Avg', color: '#FFD700' },
+  { min: 175, label: 'Average', color: '#FF9800' },
+  { min: 0,   label: 'Below Avg', color: '#C0392B' },
 ];
 
 function getTier(avgImpact) {
@@ -52,7 +52,7 @@ function getTier(avgImpact) {
   return TIERS[TIERS.length - 1];
 }
 
-function SwingerRow({ player, color, rank, maxImpact }) {
+function SwingerRow({ player, color, rank, maxImpact, advantageColor }) {
   const [showPopup, setShowPopup] = useState(false);
   const timerRef = useRef(null);
   const clutch = player.clutchGames > 0;
@@ -100,7 +100,7 @@ function SwingerRow({ player, color, rank, maxImpact }) {
               CL
             </span>
           )}
-          <span className="font-mono text-xs" style={{ color: tier.color, fontWeight: 700 }}>
+          <span className="font-mono text-xs" style={{ color: advantageColor, fontWeight: 700 }}>
             {impact > 0 ? '+' : ''}{Math.round(impact)}
           </span>
         </span>
@@ -108,7 +108,7 @@ function SwingerRow({ player, color, rank, maxImpact }) {
       <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
         <span className="text-[10px] text-[#8494a7] shrink-0" style={{ width: '14px' }}></span>
         <div className="bg-[#ebebeb] rounded-full overflow-hidden flex-1" style={{ height: '3px' }}>
-          <div className="rounded-full" style={{ width: `${barPct}%`, backgroundColor: tier.color, height: '100%' }} />
+          <div className="rounded-full" style={{ width: `${barPct}%`, backgroundColor: advantageColor, height: '100%' }} />
         </div>
         <span className="text-[10px] text-[#8494a7] shrink-0">
           {player.gamesPlayed}gm
@@ -192,6 +192,10 @@ export default function PregameMatchup({ rolling3Away, rolling3Home, pregameSwin
   const homeSwingers = [...(pregameSwingers?.home || [])].sort((a, b) => Number(b.avgWeightedImpact) - Number(a.avgWeightedImpact));
   const allImpacts = [...awaySwingers, ...homeSwingers].map(p => Math.abs(Number(p.avgWeightedImpact)));
   const maxImpact = Math.max(...allImpacts, 1);
+  const awayTotal = awaySwingers.reduce((s, p) => s + (Number(p.avgWeightedImpact) || 0), 0);
+  const homeTotal = homeSwingers.reduce((s, p) => s + (Number(p.avgWeightedImpact) || 0), 0);
+  const awayAdvantageColor = awayTotal >= homeTotal ? '#00C853' : '#C0392B';
+  const homeAdvantageColor = homeTotal >= awayTotal ? '#00C853' : '#C0392B';
 
   return (
     <>
@@ -211,49 +215,51 @@ export default function PregameMatchup({ rolling3Away, rolling3Home, pregameSwin
       </div>
       {open && (
         <div style={{ paddingBottom: '6px', marginBottom: '2px', borderLeft: '2px solid #dce6f0', paddingLeft: '10px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
-          {/* Subsection: Lines */}
+          {/* Lines — compact inline */}
           {hasOdds && (
-            <>
-              <SubsectionHeader title="Lines" />
-              <div className="flex items-center justify-center gap-4" style={{ padding: '2px 0' }}>
-                {odds.details && (
-                  <span className="font-mono text-xs font-bold text-[#333]">{odds.details}</span>
-                )}
-                {odds.overUnder != null && (
-                  <span className="font-mono text-xs text-[#6b7c93]">O/U {odds.overUnder}</span>
-                )}
-              </div>
-              {odds.provider && (
-                <div className="text-center" style={{ fontSize: '9px', color: '#8494a7' }}>{odds.provider}</div>
+            <div className="flex items-center gap-2" style={{ margin: '6px 0 4px' }}>
+              <span className="text-xs font-bold text-[#001c55] uppercase tracking-wide">Lines</span>
+              <div className="flex-1 h-px bg-[#dce6f0]" />
+              {odds.details && (
+                <span className="font-mono text-xs font-bold" style={{
+                  color: odds.details.includes(awayAbbr) ? awayColor
+                    : odds.details.includes(homeAbbr) ? homeColor
+                    : '#333'
+                }}>{odds.details}</span>
               )}
-            </>
+              {odds.details && odds.overUnder != null && (
+                <div style={{ width: '1px', height: '12px', background: '#dce6f0' }} />
+              )}
+              {odds.overUnder != null && (
+                <span className="font-mono text-xs font-bold text-[#1493ff]">O/U {odds.overUnder}</span>
+              )}
+            </div>
           )}
 
-          {/* Subsection: Momentum Trends */}
+          {/* Momentum Trends — single row */}
           {hasMomentum && (
             <>
-              <SubsectionHeader title="Momentum Trends" />
-              <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                <span className="text-xs font-bold tracking-wide" style={{ color: awayColor }}>{awayAbbr}</span>
-                <span className="text-xs text-[#8494a7]">{gamesLabel}</span>
-                <span className="text-xs font-bold tracking-wide" style={{ color: homeColor }}>{homeAbbr}</span>
-              </div>
-              {(rolling3Away?.mvix != null || rolling3Home?.mvix != null) && (
-                <StatRow
-                  label="MVIX"
-                  awayVal={rolling3Away?.mvix ?? '–'}
-                  homeVal={rolling3Home?.mvix ?? '–'}
-                  colorFn={(v) => v === '–' ? '#8494a7' : mvixColor(v)}
-                />
-              )}
-              {(rolling3Away?.mrvi != null || rolling3Home?.mrvi != null) && (
-                <StatRow
-                  label="MRVI"
-                  awayVal={rolling3Away?.mrvi != null ? Math.round(rolling3Away.mrvi) : '–'}
-                  homeVal={rolling3Home?.mrvi != null ? Math.round(rolling3Home.mrvi) : '–'}
-                  colorFn={(v) => v === '–' ? '#8494a7' : mrviColor(v)}
-                />
-              )}
+            <div className="flex items-center gap-2" style={{ margin: '6px 0 2px' }}>
+              <span className="text-xs font-bold text-[#001c55] uppercase tracking-wide">Momentum Trends</span>
+              <span className="text-[10px] text-[#8494a7]">{gamesLabel}</span>
+              <div className="flex-1 h-px bg-[#dce6f0]" />
+            </div>
+            <div className="flex items-center gap-2" style={{ margin: '0 0 4px' }}>
+              <span className="font-mono text-xs">
+                <span style={{ fontWeight: 700, color: rolling3Away?.mvix != null ? mvixColor(rolling3Away.mvix) : '#8494a7' }}>{rolling3Away?.mvix ?? '–'}</span>
+                <span className="text-[#8494a7]"> MVIX</span>
+                <span className="text-[#8494a7]"> | </span>
+                <span style={{ fontWeight: 700, color: rolling3Away?.mrvi != null ? mrviColor(rolling3Away.mrvi) : '#8494a7' }}>{rolling3Away?.mrvi != null ? Math.round(rolling3Away.mrvi) : '–'}</span>
+                <span className="text-[#8494a7]"> MRVI</span>
+              </span>
+              <div className="flex-1 h-px bg-[#dce6f0]" />
+              <span className="font-mono text-xs">
+                <span className="text-[#8494a7]">MVIX </span>
+                <span style={{ fontWeight: 700, color: rolling3Home?.mvix != null ? mvixColor(rolling3Home.mvix) : '#8494a7' }}>{rolling3Home?.mvix ?? '–'}</span>
+                <span className="text-[#8494a7]"> | MRVI </span>
+                <span style={{ fontWeight: 700, color: rolling3Home?.mrvi != null ? mrviColor(rolling3Home.mrvi) : '#8494a7' }}>{rolling3Home?.mrvi != null ? Math.round(rolling3Home.mrvi) : '–'}</span>
+              </span>
+            </div>
             </>
           )}
 
@@ -261,33 +267,40 @@ export default function PregameMatchup({ rolling3Away, rolling3Home, pregameSwin
           {hasSwingers && (
             <>
               <SubsectionHeader title="Top Swingers" />
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-[1fr_1px_1fr] gap-3">
                 <div>
                   <div className="text-xs font-bold tracking-wide mb-1 flex items-center gap-1" style={{ color: awayColor }}>
                     {awayAbbr}
-                    <span className="font-mono" style={{ fontSize: '10px', color: '#555' }}>
-                      ({Math.round(awaySwingers.reduce((s, p) => s + (Number(p.avgWeightedImpact) || 0), 0))} total)
+                    <span className="font-mono" style={{ fontSize: '10px', color: awayAdvantageColor, fontWeight: 700 }}>
+                      ({Math.round(awayTotal)} total)
                     </span>
                   </div>
                   {awaySwingers.length > 0 ? (
-                    awaySwingers.map((p, i) => (
-                      <SwingerRow key={i} player={p} color={awayColor} rank={i + 1} maxImpact={maxImpact} />
-                    ))
+                    awaySwingers.map((p, i) => {
+                      const awayImp = Number(p.avgWeightedImpact) || 0;
+                      const homeImp = Number(homeSwingers[i]?.avgWeightedImpact) || 0;
+                      const ac = awayImp >= homeImp ? '#00C853' : '#C0392B';
+                      return <SwingerRow key={i} player={p} color={awayColor} rank={i + 1} maxImpact={maxImpact} advantageColor={ac} />;
+                    })
                   ) : (
                     <span className="text-xs text-[#8494a7]">No data</span>
                   )}
                 </div>
+                <div style={{ backgroundColor: '#dce6f0' }} />
                 <div>
                   <div className="text-xs font-bold tracking-wide mb-1 flex items-center justify-end gap-1" style={{ color: homeColor }}>
-                    <span className="font-mono" style={{ fontSize: '10px', color: '#555' }}>
-                      ({Math.round(homeSwingers.reduce((s, p) => s + (Number(p.avgWeightedImpact) || 0), 0))} total)
+                    <span className="font-mono" style={{ fontSize: '10px', color: homeAdvantageColor, fontWeight: 700 }}>
+                      ({Math.round(homeTotal)} total)
                     </span>
                     {homeAbbr}
                   </div>
                   {homeSwingers.length > 0 ? (
-                    homeSwingers.map((p, i) => (
-                      <SwingerRow key={i} player={p} color={homeColor} rank={i + 1} maxImpact={maxImpact} />
-                    ))
+                    homeSwingers.map((p, i) => {
+                      const homeImp = Number(p.avgWeightedImpact) || 0;
+                      const awayImp = Number(awaySwingers[i]?.avgWeightedImpact) || 0;
+                      const ac = homeImp >= awayImp ? '#00C853' : '#C0392B';
+                      return <SwingerRow key={i} player={p} color={homeColor} rank={i + 1} maxImpact={maxImpact} advantageColor={ac} />;
+                    })
                   ) : (
                     <span className="text-xs text-[#8494a7]">No data</span>
                   )}
