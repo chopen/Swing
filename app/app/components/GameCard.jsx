@@ -277,6 +277,7 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
           <PregameMatchup
             rolling3Away={g.rolling3Away}
             rolling3Home={g.rolling3Home}
+            pregameSwingers={g.pregameSwingers}
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
             awayColor={awayColorAdj}

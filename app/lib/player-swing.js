@@ -51,6 +51,46 @@ export async function hasSwingImpact(gameId) {
 }
 
 /**
+ * Get top swingers for a team from recent games, excluding a specific game.
+ * Adjusts weighted impact by conference strength factor.
+ */
+export async function getRecentTeamSwingers(team, league, excludeGameId, limit = 3) {
+  // Get conference strength for this team (most recent entry)
+  const { rows: confRows } = await sql`
+    SELECT conf_strength FROM team_mvix
+    WHERE team = ${team} AND league = ${league} AND conf_strength IS NOT NULL
+    ORDER BY game_date DESC LIMIT 1
+  `;
+  const confStrength = confRows[0]?.conf_strength ?? 1;
+
+  const { rows } = await sql`
+    SELECT player_name AS "player",
+           athlete_id AS "athleteId",
+           jersey,
+           COUNT(*) AS "gamesPlayed",
+           ROUND(AVG(COALESCE(weighted_impact, total_impact))::numeric, 1) AS "avgWeightedImpact",
+           ROUND(AVG(efficiency)::numeric, 1) AS "avgEfficiency",
+           SUM(CASE WHEN COALESCE(clutch_appearances, 0) > 0 THEN 1 ELSE 0 END)::integer AS "clutchGames"
+    FROM player_swing_impact
+    WHERE team = ${team}
+      AND league = ${league}
+      AND game_id != ${excludeGameId}
+    GROUP BY player_name, athlete_id, jersey
+    HAVING COUNT(*) >= 1
+    ORDER BY AVG(COALESCE(weighted_impact, total_impact)) DESC
+    LIMIT ${limit}
+  `;
+
+  // Apply conference strength adjustment
+  return rows.map(r => ({
+    ...r,
+    avgWeightedImpact: Math.round(Number(r.avgWeightedImpact) * confStrength * 10) / 10,
+    rawAvgWeightedImpact: Number(r.avgWeightedImpact),
+    confStrength,
+  }));
+}
+
+/**
  * Get aggregated player swing impact across games for a team.
  */
 export async function getTeamPlayerImpact(team, league, limit = 20) {

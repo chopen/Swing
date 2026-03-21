@@ -6,8 +6,24 @@
  */
 
 import { getWeeklySwingersbyConference } from '../../../../lib/player-swing';
+import { sql } from '../../../../lib/db';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Get conference strength factors for all teams.
+ */
+async function getTeamConfStrengthMap() {
+  const { rows } = await sql`
+    SELECT DISTINCT ON (team) team, conf_strength
+    FROM team_mvix
+    WHERE conf_strength IS NOT NULL
+    ORDER BY team, game_date DESC
+  `;
+  const map = {};
+  rows.forEach(r => { map[r.team] = Number(r.conf_strength); });
+  return map;
+}
 
 /**
  * Resolve the Monday–Sunday week window containing the given date.
@@ -48,25 +64,37 @@ export async function GET(request) {
 
     // Query all players for the week, optionally filtered by conference name
     const rows = await getWeeklySwingersbyConference(week.start, week.end, conferenceFilter);
+    const confStrengthMap = await getTeamConfStrengthMap();
+
+    // Apply conference strength adjustment and re-sort
+    const adjusted = rows.map(row => {
+      const cs = confStrengthMap[row.team] || 1;
+      const rawImpact = Number(row.avgWeightedImpact);
+      return {
+        player: row.player,
+        athleteId: row.athleteId,
+        jersey: row.jersey,
+        team: row.team,
+        conference: row.conference,
+        gamesPlayed: Number(row.gamesPlayed),
+        avgWeightedImpact: Math.round(rawImpact * cs * 10) / 10,
+        rawAvgWeightedImpact: rawImpact,
+        confStrength: cs,
+        totalWeightedImpact: Math.round(Number(row.totalWeightedImpact) * cs * 10) / 10,
+        avgEfficiency: Number(row.avgEfficiency),
+        clutchGames: Number(row.clutchGames),
+      };
+    }).sort((a, b) => b.avgWeightedImpact - a.avgWeightedImpact);
 
     // Group by conference and take top 3 per conference
     const byConference = {};
-    for (const row of rows) {
+    for (const row of adjusted) {
       const conf = row.conference;
       if (!conf) continue;
       if (!byConference[conf]) byConference[conf] = [];
       if (byConference[conf].length < 3) {
-        byConference[conf].push({
-          player: row.player,
-          athleteId: row.athleteId,
-          jersey: row.jersey,
-          team: row.team,
-          gamesPlayed: Number(row.gamesPlayed),
-          avgWeightedImpact: Number(row.avgWeightedImpact),
-          totalWeightedImpact: Number(row.totalWeightedImpact),
-          avgEfficiency: Number(row.avgEfficiency),
-          clutchGames: Number(row.clutchGames),
-        });
+        const { conference: _, ...player } = row;
+        byConference[conf].push(player);
       }
     }
 

@@ -14,6 +14,7 @@ const { computeGameSwingImpact } = require('../../../lib/swing-impact');
 import { computeGameVolatility } from '../../../lib/mvix';
 import { recordGameMvix, getRolling3Excluding } from '../../../lib/team-mvix';
 import { logAlert, getAlertLogs } from '../../../lib/alert-logs';
+import { getRecentTeamSwingers } from '../../../lib/player-swing';
 
 const LIVE_STATUSES = new Set(['STATUS_IN_PROGRESS', 'STATUS_HALFTIME']);
 const CACHE_TTL = 10_000; // 10 seconds
@@ -24,6 +25,7 @@ let fetchInFlight = null;
 const finalMomCache = new Map(); // gameId -> momentum data (never changes once final)
 const swingImpactCache = new Map(); // gameId -> swing impact data (cached for final + live)
 const rolling3Cache = new Map(); // gameId -> { away, home } rolling 3-game MVIX
+const pregameSwingersCache = new Map(); // gameId -> { away, home } top 3 swingers per team
 
 // Separate cache for historical date requests
 const historicalCache = new Map(); // dateStr -> { data, timestamp }
@@ -133,6 +135,21 @@ async function buildPollData(dateStr) {
     if (r3) {
       g.rolling3Away = r3.away;
       g.rolling3Home = r3.home;
+    }
+
+    // Attach pregame swingers (top 3 per team from prior games, cached per game)
+    if (!pregameSwingersCache.has(g.id)) {
+      try {
+        const [awaySw, homeSw] = await Promise.all([
+          getRecentTeamSwingers(g.awayAbbr, g.league, g.id, 3),
+          getRecentTeamSwingers(g.homeAbbr, g.league, g.id, 3),
+        ]);
+        pregameSwingersCache.set(g.id, { away: awaySw, home: homeSw });
+      } catch {}
+    }
+    const pgs = pregameSwingersCache.get(g.id);
+    if (pgs) {
+      g.pregameSwingers = pgs;
     }
 
     const alerts = detectAlerts(g);

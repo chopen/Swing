@@ -29,9 +29,19 @@ function rankBadge(i) {
   return '<span class="rank bronze">3</span>';
 }
 
+function tierLabel(impact) {
+  if (impact >= 305) return '<span class="tier tier-elite">Elite</span>';
+  if (impact >= 255) return '<span class="tier tier-excellent">Excellent</span>';
+  if (impact >= 215) return '<span class="tier tier-above">Above Avg</span>';
+  if (impact >= 175) return '<span class="tier tier-avg">Average</span>';
+  return '<span class="tier tier-below">Below Avg</span>';
+}
+
 function playerRow(p, i) {
   const jersey = p.jersey ? `#${p.jersey}` : '';
   const clutch = p.clutchGames > 0 ? '<span class="clutch">CLUTCH</span>' : '';
+  const cs = p.confStrength != null ? p.confStrength : 1;
+  const raw = p.rawAvgWeightedImpact || p.avgWeightedImpact;
   return `
     <tr>
       <td class="rank-cell">${rankBadge(i)}</td>
@@ -39,8 +49,10 @@ function playerRow(p, i) {
         <span class="player-name">${p.player}</span>
         <span class="player-meta">${jersey} &middot; ${p.team}</span>
         ${clutch}
+        ${tierLabel(p.avgWeightedImpact)}
       </td>
       <td class="stat">${p.avgWeightedImpact}</td>
+      <td class="stat-small">${raw !== p.avgWeightedImpact ? raw + ' &times;' + cs : '–'}</td>
       <td class="stat">${p.avgEfficiency}%</td>
       <td class="stat">${p.gamesPlayed}</td>
     </tr>`;
@@ -56,7 +68,8 @@ function conferenceSection(confName, players) {
           <tr>
             <th style="width:30px"></th>
             <th class="left">Player</th>
-            <th>Avg Impact</th>
+            <th>Adj Impact</th>
+            <th>Raw &times; Conf</th>
             <th>Efficiency</th>
             <th>Games</th>
           </tr>
@@ -248,6 +261,26 @@ async function main() {
     font-weight: 600;
     color: #333;
   }
+  .stat-small {
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #8494a7;
+  }
+  .tier {
+    font-size: 7px;
+    font-weight: 800;
+    border-radius: 2px;
+    padding: 0 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+    border: 1px solid;
+  }
+  .tier-elite { color: #C0392B; border-color: #C0392B; }
+  .tier-excellent { color: #E67E22; border-color: #E67E22; }
+  .tier-above { color: #1493ff; border-color: #1493ff; }
+  .tier-avg { color: #6b7c93; border-color: #6b7c93; }
+  .tier-below { color: #8494a7; border-color: #8494a7; }
   .footer-note {
     margin-top: 30px;
     text-align: center;

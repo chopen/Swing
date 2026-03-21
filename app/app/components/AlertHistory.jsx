@@ -19,8 +19,8 @@ export default function AlertHistory({ alertLogs, awayAbbr, homeAbbr, awayColor,
         className={`flex items-center justify-between py-3 border-t border-[#f0f0f0] select-none transition-colors ${alerts.length > 0 ? 'cursor-pointer' : 'opacity-50'}`}
         onClick={() => alerts.length > 0 && setOpen(!open)}
       >
-        <span className="text-sm font-semibold text-[#6b7c93]">
-          {open ? '\u25BE' : '\u25B8'} Swing History{' '}<span className="text-[#8494a7]">({alerts.length})</span>
+        <span className="text-sm font-semibold text-[#1493ff]">
+          {open ? '\u25BE' : '\u25B8'} Swing Alert Feed{' '}<span className="text-[#8494a7]">({alerts.length})</span>
         </span>
         <span
           className="text-sm text-[#8494a7] inline-block transition-transform duration-200"
@@ -30,7 +30,7 @@ export default function AlertHistory({ alertLogs, awayAbbr, homeAbbr, awayColor,
         </span>
       </div>
       {open && (
-        <div className="max-h-[240px] overflow-y-auto py-2 scrollbar-thin">
+        <div className="max-h-[240px] overflow-y-auto py-2 scrollbar-thin" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
           {alerts.length === 0 && (
             <div className="text-sm text-[#8494a7] text-center py-2">No swings recorded</div>
           )}

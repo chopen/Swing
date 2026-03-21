@@ -698,19 +698,19 @@ export default function Dashboard() {
               </div>
               <div className="flex items-start" style={{ gap: '8px' }}>
                 <span className="text-sm text-[#8494a7] shrink-0">▸</span>
-                <span className="text-sm"><strong className="text-[#6b7c93]">Pregame Matchup</strong> &mdash; rolling MVIX &amp; MRVI for each team</span>
+                <span className="text-sm"><strong className="text-[#6b7c93]">Pregame 411</strong> &mdash; rolling MVIX &amp; MRVI for each team</span>
               </div>
               <div className="flex items-start" style={{ gap: '8px' }}>
                 <span className="text-sm text-[#8494a7] shrink-0">▸</span>
-                <span className="text-sm"><strong className="text-[#6b7c93]">Play Feed</strong> &mdash; live play-by-play log</span>
+                <span className="text-sm"><strong className="text-[#6b7c93]">Play by Play Feed</strong> &mdash; live play-by-play log</span>
               </div>
               <div className="flex items-start" style={{ gap: '8px' }}>
                 <span className="text-sm text-[#8494a7] shrink-0">▸</span>
-                <span className="text-sm"><strong className="text-[#6b7c93]">Swingers</strong> &mdash; top players driving momentum shifts, weighted by magnitude. <strong style={{ color: '#C0392B' }}>CLUTCH</strong> = late-game impact.</span>
+                <span className="text-sm"><strong className="text-[#6b7c93]">Swingers - Live In Game</strong> &mdash; top players driving momentum shifts, weighted by magnitude. <strong style={{ color: '#C0392B' }}>CLUTCH</strong> = late-game impact.</span>
               </div>
               <div className="flex items-start" style={{ gap: '8px' }}>
                 <span className="text-sm text-[#8494a7] shrink-0">▸</span>
-                <span className="text-sm"><strong className="text-[#6b7c93]">Swing History</strong> &mdash; every alert with full game state</span>
+                <span className="text-sm"><strong className="text-[#6b7c93]">Swing Alert Feed</strong> &mdash; every alert with full game state</span>
               </div>
             </div>
           </div>

@@ -109,8 +109,8 @@ export default function SwingersPanel({ swingers, awayAbbr, homeAbbr, awayColor,
         className="flex items-center justify-between py-3 border-t border-[#f0f0f0] cursor-pointer select-none transition-colors"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-sm font-semibold text-[#6b7c93]">
-          {open ? '\u25BE' : '\u25B8'} Swingers{' '}<span className="text-[#8494a7]">({totalCount})</span>
+        <span className="text-sm font-semibold text-[#1493ff]">
+          {open ? '\u25BE' : '\u25B8'} Swingers - Live In Game{' '}<span className="text-[#8494a7]">({totalCount})</span>
         </span>
         <span
           className="text-sm text-[#8494a7] inline-block transition-transform duration-200"
@@ -120,7 +120,7 @@ export default function SwingersPanel({ swingers, awayAbbr, homeAbbr, awayColor,
         </span>
       </div>
       {open && (
-        <div className="grid grid-cols-2 gap-3 pb-2">
+        <div className="grid grid-cols-2 gap-3 pb-2" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
           {/* Away swingers */}
           <div>
             <div

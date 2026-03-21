@@ -13,8 +13,8 @@ export default function PlayFeed({ plays, awayAbbr, homeAbbr, awayColor, homeCol
         className="flex items-center justify-between py-3 border-t border-[#f0f0f0] cursor-pointer select-none transition-colors"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-sm font-semibold text-[#6b7c93]">
-          {open ? '\u25BE' : '\u25B8'} Play Feed
+        <span className="text-sm font-semibold text-[#1493ff]">
+          {open ? '\u25BE' : '\u25B8'} Play by Play Feed
         </span>
         <span
           className="text-sm text-[#8494a7] inline-block transition-transform duration-200"
@@ -24,7 +24,7 @@ export default function PlayFeed({ plays, awayAbbr, homeAbbr, awayColor, homeCol
         </span>
       </div>
       {open && (
-        <div className="max-h-[180px] overflow-y-auto py-2 scrollbar-thin">
+        <div className="max-h-[180px] overflow-y-auto py-2 scrollbar-thin" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
           {plays.map((p, i) => {
             const color = p.team === awayAbbr ? awayColor : homeColor;
             const isMake = (p.text || '').toLowerCase().includes('makes');
