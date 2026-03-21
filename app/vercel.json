@@ -2,5 +2,11 @@
   "framework": "nextjs",
   "git": {
     "deploymentEnabled": true
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/poll",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }
