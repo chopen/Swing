@@ -213,7 +213,7 @@ export default function PregameMatchup({ rolling3Away, rolling3Home, pregameSwin
         </span>
       </div>
       {open && (
-        <div style={{ paddingBottom: '6px', marginBottom: '2px', borderLeft: '2px solid #dce6f0', paddingLeft: '10px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
+        <div style={{ paddingBottom: '6px', marginBottom: '2px', padding: '6px 8px', background: '#f0f4f8', borderRadius: '0 0 6px 6px', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.06)' }}>
           {/* Lines — compact inline */}
           {hasOdds && (
             <div className="flex items-center gap-2" style={{ margin: '6px 0 4px' }}>

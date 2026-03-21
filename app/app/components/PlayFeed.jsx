@@ -24,7 +24,7 @@ export default function PlayFeed({ plays, awayAbbr, homeAbbr, awayColor, homeCol
         </span>
       </div>
       {open && (
-        <div className="max-h-[180px] overflow-y-auto py-2 scrollbar-thin" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
+        <div className="max-h-[180px] overflow-y-auto py-2 scrollbar-thin" style={{ padding: '6px 8px', marginBottom: '2px', background: '#f0f4f8', borderRadius: '0 0 6px 6px', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.06)' }}>
           {plays.map((p, i) => {
             const color = p.team === awayAbbr ? awayColor : homeColor;
             const isMake = (p.text || '').toLowerCase().includes('makes');

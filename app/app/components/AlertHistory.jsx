@@ -30,7 +30,7 @@ export default function AlertHistory({ alertLogs, awayAbbr, homeAbbr, awayColor,
         </span>
       </div>
       {open && (
-        <div className="max-h-[240px] overflow-y-auto py-2 scrollbar-thin" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
+        <div className="max-h-[240px] overflow-y-auto py-2 scrollbar-thin" style={{ padding: '6px 8px', marginBottom: '2px', background: '#f0f4f8', borderRadius: '0 0 6px 6px', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.06)' }}>
           {alerts.length === 0 && (
             <div className="text-sm text-[#8494a7] text-center py-2">No swings recorded</div>
           )}

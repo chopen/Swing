@@ -118,7 +118,7 @@ export default function SwingersPanel({ swingers, awayAbbr, homeAbbr, awayColor,
         </span>
       </div>
       {open && (
-        <div className="grid grid-cols-[1fr_1px_1fr] gap-3 pb-2" style={{ borderLeft: '2px solid #dce6f0', paddingLeft: '10px', marginBottom: '2px', background: '#f8fafc', borderRadius: '0 0 6px 6px' }}>
+        <div className="grid grid-cols-[1fr_1px_1fr] gap-3 pb-2" style={{ padding: '6px 8px', marginBottom: '2px', background: '#f0f4f8', borderRadius: '0 0 6px 6px', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.06)' }}>
           {/* Away swingers */}
           <div>
             <div className="text-xs font-bold tracking-wide mb-1 flex items-center gap-1" style={{ color: awayColor }}>
