@@ -205,20 +205,24 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
         </div>
       </div>
 
-      <PregameMatchup
-        rolling3Away={g.rolling3Away}
-        rolling3Home={g.rolling3Home}
-        pregameSwingers={g.pregameSwingers}
-        odds={g.odds}
-        awayAbbr={g.awayAbbr}
-        homeAbbr={g.homeAbbr}
-        awayColor={awayColorAdj}
-        homeColor={homeColorAdj}
-      />
+      {/* Pregame 411 — show above momentum bars for pregame only */}
+      {!hasMom && (
+        <PregameMatchup
+          rolling3Away={g.rolling3Away}
+          rolling3Home={g.rolling3Home}
+          pregameSwingers={g.pregameSwingers}
+          odds={g.odds}
+          awayAbbr={g.awayAbbr}
+          homeAbbr={g.homeAbbr}
+          awayColor={awayColorAdj}
+          homeColor={homeColorAdj}
+        />
+      )}
 
       {/* Momentum section */}
       {hasMom && (
         <>
+          <div style={{ border: '1px solid #c8d6e5', borderRadius: '10px', padding: '10px', marginBottom: '6px', background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08)' }}>
           <div className="pb-2 pt-0">
             <div className="flex items-center gap-3 mb-1.5">
               <div className="flex-1 bg-[#ebebeb] rounded-full overflow-hidden relative" style={{ height: '26px' }}>
@@ -282,9 +286,13 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
             mvixAway={g.mvixAway}
             mvixHome={g.mvixHome}
           />
+          </div>
 
-          <PlayFeed
-            plays={g.mom.recentPlays}
+          <PregameMatchup
+            rolling3Away={g.rolling3Away}
+            rolling3Home={g.rolling3Home}
+            pregameSwingers={g.pregameSwingers}
+            odds={g.odds}
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
             awayColor={awayColorAdj}
@@ -301,6 +309,14 @@ export default function GameCard({ game, user, subscribedGames, onToggleSubscrib
 
           <AlertHistory
             alertLogs={g.alertLogs}
+            awayAbbr={g.awayAbbr}
+            homeAbbr={g.homeAbbr}
+            awayColor={awayColorAdj}
+            homeColor={homeColorAdj}
+          />
+
+          <PlayFeed
+            plays={g.mom.recentPlays}
             awayAbbr={g.awayAbbr}
             homeAbbr={g.homeAbbr}
             awayColor={awayColorAdj}
